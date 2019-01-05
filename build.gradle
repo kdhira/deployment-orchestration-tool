@@ -12,21 +12,37 @@ plugins {
 
     // Apply the application plugin to add support for building an application
     id 'application'
+
+    // Apply maven plugin
+    id 'maven'
 }
 
+archivesBaseName = 'deployment-orchestration-tool'
+version = '0.0.1'
+group = 'com.kdhira'
+
 repositories {
-    // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    // This dependency is found on compile classpath of this component and consumers.
-    implementation 'com.google.guava:guava:26.0-jre'
+    // https://mvnrepository.com/artifact/junit/junit
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
+    // https://mvnrepository.com/artifact/com.jcraft/jsch
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
 }
 
 // Define the main class for the application
 mainClassName = 'com.kdhira.dot.App'
+
+jar {
+    manifest { 
+        attributes "Main-Class": "$mainClassName"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
