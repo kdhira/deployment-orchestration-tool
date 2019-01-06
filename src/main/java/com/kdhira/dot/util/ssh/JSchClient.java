@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Properties;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -15,6 +16,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 public class JSchClient implements SSHClient {
+
     private JSch jsch;
     private Session session;
 
@@ -22,39 +24,24 @@ public class JSchClient implements SSHClient {
     private int port;
     private String user;
 
-    public JSchClient(String host, String user, String keyFile) throws SSHException {
-        this(host, 22, user, keyFile, null);
+    public JSchClient(String host, String user, JSchAuthentication auth) throws SSHException {
+        this(host, 22, user, auth, new Properties());
     }
 
-    public JSchClient(String host, int port, String user, String keyFile) throws SSHException {
-        this(host, port, user, keyFile, null);
+    public JSchClient(String host, int port, String user, JSchAuthentication auth) throws SSHException {
+        this(host, port, user, auth, new Properties());
     }
 
-    public JSchClient(String host, String user, String keyFile, String keyPass) throws SSHException {
-        this(host, 22, user, keyFile, keyPass);
+    public JSchClient(String host, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
+        this(host, 22, user, auth, configuration);
     }
-
-    public JSchClient(String host, int port, String user, String keyFile, String keyPass) throws SSHException {
+    public JSchClient(String host, int port, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
         this.host = host;
         this.port = port;
         this.user = user;
         jsch = new JSch();
 
-        if (keyFile != null) {
-            if (keyPass != null) {
-                try {
-                    jsch.addIdentity(keyFile, keyPass);
-                } catch (JSchException e) {
-                    throw new SSHException("Private key is invalid or passphrase incorrect.", e);
-                }
-            } else {
-                try {
-                    jsch.addIdentity(keyFile);
-                } catch (JSchException e) {
-                    throw new SSHException("Private key is invalid.", e);
-                }
-            }
-        }
+        auth.configureClient(jsch);
 
         try {
             session = jsch.getSession(user, host, port);
@@ -62,8 +49,8 @@ public class JSchClient implements SSHClient {
             throw new SSHException("Could not create SSH session. Username and/or host invalid.", e);
         }
 
-        withConfig("StrictHostKeyChecking", "no");
-
+        auth.configureSession(session);
+        session.setConfig(configuration);
 
         try {
             session.connect();
@@ -72,14 +59,11 @@ public class JSchClient implements SSHClient {
         }
     }
 
-    public SSHClient withConfig(String property, String value) {
-        session.setConfig(property, value);
-        return this;
-    }
-
     @Override
-    public void close() throws Exception {
-        session.disconnect();
+    public void close() throws SSHException {
+        if (session.isConnected()) {
+            session.disconnect();
+        }
     }
 
     public void push(String localPath, String remotePath) throws SSHException, IOException {
@@ -154,7 +138,6 @@ public class JSchClient implements SSHClient {
         }
         channel.disconnect();
     }
-
 
     public void pull(String remotePath, String localPath) throws SSHException, IOException {
         String prefix = null;
