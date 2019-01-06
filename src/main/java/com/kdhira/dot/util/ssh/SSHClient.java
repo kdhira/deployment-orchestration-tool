@@ -7,15 +7,9 @@ import java.io.IOException;
  * Uses Jcraft's JSch implementation
  * @author Kevin Hira
  */
-public interface SSHClient {
+public interface SSHClient extends AutoCloseable {
 
     SSHClient withConfig(String property, String value);
-
-    SSHClient connect() throws SSHException;
-
-    void disconnect() throws SSHException;
-
-    boolean isConnected();
 
     void push(String localPath, String remotePath) throws SSHException, IOException;
 

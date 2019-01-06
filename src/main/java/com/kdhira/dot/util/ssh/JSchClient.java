@@ -63,6 +63,13 @@ public class JSchClient implements SSHClient {
         }
 
         withConfig("StrictHostKeyChecking", "no");
+
+
+        try {
+            session.connect();
+        } catch (JSchException e) {
+            throw new SSHException(e);
+        }
     }
 
     public SSHClient withConfig(String property, String value) {
@@ -70,32 +77,9 @@ public class JSchClient implements SSHClient {
         return this;
     }
 
-    public SSHClient connect() throws SSHException {
-        if (!isConnected()) {
-            try {
-                session.connect();
-            } catch (JSchException e) {
-                throw new SSHException(e);
-            }
-        }
-        else {
-            throw new SSHException("Session already connected.");
-        }
-
-        return this;
-    }
-
-    public boolean isConnected() {
-        return session.isConnected();
-    }
-
-    public void disconnect() throws SSHException {
-        if (isConnected()) {
-            session.disconnect();
-        }
-        else {
-            throw new SSHException("Session not connected.");
-        }
+    @Override
+    public void close() throws Exception {
+        session.disconnect();
     }
 
     public void push(String localPath, String remotePath) throws SSHException, IOException {
