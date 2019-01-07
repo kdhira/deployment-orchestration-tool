@@ -1,4 +1,4 @@
-package com.kdhira.dot.util.ssh;
+package com.kdhira.dot.util.ssh.jsch;
 
 import com.jcraft.jsch.Session;
 import com.kdhira.dot.util.MaskedReader;

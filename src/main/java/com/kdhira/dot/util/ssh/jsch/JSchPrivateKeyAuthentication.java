@@ -1,8 +1,9 @@
-package com.kdhira.dot.util.ssh;
+package com.kdhira.dot.util.ssh.jsch;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.kdhira.dot.util.ssh.SSHException;
 
 public class JSchPrivateKeyAuthentication implements JSchAuthentication {
 
