@@ -182,6 +182,7 @@ public class JSchClient implements SSHClient {
             }
         }
 
+        System.out.print(outputBuffer.toString());
         return getExitCodeAndDisconnect(channel);
 
     }
