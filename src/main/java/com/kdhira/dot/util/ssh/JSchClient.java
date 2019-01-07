@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.Properties;
 
 import com.jcraft.jsch.Channel;
@@ -66,11 +65,9 @@ public class JSchClient implements SSHClient {
         }
     }
 
-    public void push(String localPath, String remotePath) throws SSHException, IOException {
-        boolean ptimestamp = true;
-
+    public int push(String localPath, String remotePath) throws SSHException, IOException {
         // exec 'scp -t rfile' remotely
-        String command = "scp " + (ptimestamp ? "-p" : "") + " -t " + remotePath;
+        String command = "scp  -t " + remotePath;
         Channel channel;
         try {
             channel = session.openChannel("exec");
@@ -89,57 +86,65 @@ public class JSchClient implements SSHClient {
             throw new SSHException("Could not connect to channel.", e);
         }
 
-        checkAck(in);
+        checkAcknowledgement(in);
 
-        File _lfile = new File(localPath);
-
-        if (ptimestamp) {
-            command = "T" + (_lfile.lastModified() / 1000) + " 0";
-            // The access time should be sent here,
-            // but it is not accessible with JavaAPI ;-<
-            command += (" " + (_lfile.lastModified() / 1000) + " 0\n");
-            out.write(command.getBytes());
-            out.flush();
-
-            checkAck(in);
-        }
+        File localFile = new File(localPath);
 
         // send "C0644 filesize filename", where filename should not include '/'
-        long filesize = _lfile.length();
-        command = "C0644 " + filesize + " " + _lfile.getName() + "\n";
+        long filesize = localFile.length();
+        command = "C0644 " + filesize + " " + localFile.getName() + "\n";
         out.write(command.getBytes());
         out.flush();
 
-        checkAck(in);
+        checkAcknowledgement(in);
 
         // send a content of lfile
-        FileInputStream fis = new FileInputStream(localPath);
+        FileInputStream fis = new FileInputStream(localFile);
         byte[] buf = new byte[1024];
-        // while (true) {
-        //     int len = fis.read(buf, 0, buf.length);
-        //     if (len <= 0) break;
-        //     out.write(buf, 0, len); //out.flush();
-        // }
 
-        byte[] data = Files.readAllBytes(_lfile.toPath());
-        out.write(data);
+
+        long transfered = 0;
+        String lastMessage = "";
+
+
+        while (true) {
+            int bytesTransferred = transferBytes(fis, out, buf, buf.length);
+            if (bytesTransferred <= 0) {
+                System.out.println();
+                break;
+            }
+
+
+            transfered += bytesTransferred;
+            String next = (transfered * 100 / filesize) + "%";
+            eraseAndWrite(lastMessage, next);
+            lastMessage = next;
+        }
+
+        
 
         // send '\0'
         out.write(0);
         out.flush();
 
-        checkAck(in);
-        out.close();
 
-        try {
-            if (fis != null) fis.close();
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        channel.disconnect();
+        out.close();
+        checkAcknowledgement(in);
+        in.close();
+        fis.close();
+
+        return getExitCodeAndDisconnect(channel);
     }
 
-    public void pull(String remotePath, String localPath) throws SSHException, IOException {
+    private int transferBytes(InputStream in, OutputStream out, byte[] buffer, int length) throws IOException  {
+        int bytesRead = in.read(buffer, 0, (buffer.length <= length ? buffer.length : length));
+        if (bytesRead > 0) {
+            out.write(buffer, 0, bytesRead);
+        }
+        return bytesRead;
+    }
+
+    public int pull(String remotePath, String localPath) throws SSHException, IOException {
         String prefix = null;
 
         if (new File(localPath).isDirectory()) {
@@ -172,80 +177,71 @@ public class JSchClient implements SSHClient {
         out.write(0);
         out.flush();
 
+       
+        int c = in.read();
+        if (c != 'C') {
+            throw new SSHException("Expected start of file metadata, did not receive.");
+        }
+
+        // consume '0644 '
+        in.read(buf, 0, 5);
+
+        long filesize = Long.valueOf(readUntil(in, ' '));
+        String fileName = readUntil(in, '\n');
+
+        // send '\0'
+        out.write(0);
+        out.flush();
+
+        // read a content of lfile
+        FileOutputStream fos = new FileOutputStream(prefix == null ? localPath : prefix + fileName);
         while (true) {
-            int c = in.read();
-            if (c != 'C') {
+            int nextRead = (buf.length < filesize ? buf.length : (int)filesize);
+            int bytesTransferred = transferBytes(in, fos, buf, nextRead);
+            if (bytesTransferred <= 0) {
                 break;
             }
 
-            // read '0644 '
-            in.read(buf, 0, 5);
-
-            long filesize = 0L;
-            while (true) {
-                if (in.read(buf, 0, 1) < 0) {
-                    // error
-                    break;
-                }
-                if (buf[0] == ' ') break;
-                filesize = filesize * 10L + (long) (buf[0] - '0');
-            }
-
-            String file = null;
-            for (int i = 0; ; i++) {
-                in.read(buf, i, 1);
-                if (buf[i] == (byte) 0x0a) {
-                    file = new String(buf, 0, i);
-                    break;
-                }
-            }
-
-            // send '\0'
-            out.write(0);
-            out.flush();
-
-            // read a content of lfile
-            FileOutputStream fos = new FileOutputStream(prefix == null ? localPath : prefix + file);
-            int foo;
-            while (true) {
-                if (buf.length < filesize) foo = buf.length;
-                else foo = (int) filesize;
-                foo = in.read(buf, 0, foo);
-                if (foo < 0) {
-                    // error
-                    break;
-                }
-                fos.write(buf, 0, foo);
-                filesize -= foo;
-                if (filesize == 0L) break;
-            }
-
-            checkAck(in);
-
-            // send '\0'
-            out.write(0);
-            out.flush();
-
-            try {
-                if (fos != null) fos.close();
-            } catch (Exception ex) {
-                System.out.println(ex);
+            filesize -= bytesTransferred;
+            if (filesize == 0L) {
+                break;
             }
         }
 
-        channel.disconnect();
+        // checkAcknowledgement(in);
+
+        // send '\0'
+        out.write(0);
+        out.flush();
+
+        out.close();
+        checkAcknowledgement(in);
+        in.close();
+        fos.close();
+
+        return getExitCodeAndDisconnect(channel);
     }
 
+    private int getExitCodeAndDisconnect(Channel channel) {
+        int exitStatus = channel.getExitStatus();
+        channel.disconnect();
+        return exitStatus;
+    }
+
+    /**
+     * Check aknowledgement from server by reading stream.
+     * @param in stream to read
+     * @return acknowledgement value
+     * may be 0 for success,
+     *        1 for error,
+     *        2 for fatal error,
+     *       -1
+     * @throws IOException
+     */
     private int readAck(InputStream in) throws IOException {
         int b = in.read();
-        // b may be 0 for success,
-        //          1 for error,
-        //          2 for fatal error,
-        //         -1
-        if (b == 0) return b;
-        if (b == -1) return b;
 
-        if (b == 1 || b == 2) {
+        if (b > 0) {
             StringBuffer sb = new StringBuffer();
             int c;
             do {
@@ -253,19 +249,33 @@ public class JSchClient implements SSHClient {
                 sb.append((char) c);
             }
             while (c != '\n');
-            if (b == 1) { // error
-                System.out.print(sb.toString());
-            }
-            if (b == 2) { // fatal error
-                System.out.print(sb.toString());
-            }
+            throw new IOException(sb.toString());
         }
         return b;
     }
 
-    private void checkAck(InputStream in) throws SSHException, IOException {
+    private String readUntil(InputStream in, char stopper) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int c = in.read();
+        while (c != stopper) {
+            sb.append((char)c);
+            c = in.read();
+        }
+        return sb.toString();
+    }
+
+    private void checkAcknowledgement(InputStream in) throws SSHException, IOException {
         if (readAck(in) != 0) {
             throw new SSHException("Acknowledgement failed.");
         }
+    }
+
+    private void eraseAndWrite(String last, String next) {
+        StringBuilder sb = new StringBuilder();
+        for (char i : last.toCharArray()) {
+            sb.append("\010");
+        }
+        System.out.print(sb.toString());
+        System.out.print(next);
     }
 }

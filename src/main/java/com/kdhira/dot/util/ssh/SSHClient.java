@@ -9,9 +9,9 @@ import java.io.IOException;
  */
 public interface SSHClient extends AutoCloseable {
 
-    void push(String localPath, String remotePath) throws SSHException, IOException;
+    int push(String localPath, String remotePath) throws SSHException, IOException;
 
-    void pull(String remotePath, String localPath) throws SSHException, IOException;
+    int pull(String remotePath, String localPath) throws SSHException, IOException;
 
     void close() throws SSHException;
 
