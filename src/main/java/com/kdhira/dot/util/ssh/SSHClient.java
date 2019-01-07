@@ -13,6 +13,8 @@ public interface SSHClient extends AutoCloseable {
 
     int pull(String remotePath, String localPath) throws SSHException, IOException;
 
+    int execute(String command) throws SSHException, IOException;
+
     void close() throws SSHException;
 
 }

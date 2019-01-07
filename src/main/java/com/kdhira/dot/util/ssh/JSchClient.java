@@ -103,14 +103,6 @@ public class JSchClient implements SSHClient {
         return getExitCodeAndDisconnect(channel);
     }
 
-    private int transferBytes(InputStream in, OutputStream out, byte[] buffer, int length) throws IOException  {
-        int bytesRead = in.read(buffer, 0, (buffer.length <= length ? buffer.length : length));
-        if (bytesRead > 0) {
-            out.write(buffer, 0, bytesRead);
-        }
-        return bytesRead;
-    }
-
     public int pull(String remotePath, String localPath) throws SSHException, IOException {
         String prefix = null;
 
@@ -169,6 +161,31 @@ public class JSchClient implements SSHClient {
         return getExitCodeAndDisconnect(channel);
     }
 
+    public int execute(String command) throws SSHException, IOException {
+        Channel channel = openExecChannel(command);
+        StringBuilder outputBuffer = new StringBuilder();
+        InputStream in = channel.getInputStream();
+
+        while (!channel.isClosed()) {
+            while (in.available() > 0) {
+                int i = in.read();
+                if (i < 0) {
+                    break;
+                }
+                if (i == '\n') {
+                    System.out.println(outputBuffer.toString());
+                    outputBuffer = new StringBuilder();
+                }
+                else {
+                    outputBuffer.append((char)i);
+                }
+            }
+        }
+
+        return getExitCodeAndDisconnect(channel);
+
+    }
+
     private Channel openExecChannel(String command) throws SSHException {
         Channel channel;
         try {
@@ -191,6 +208,14 @@ public class JSchClient implements SSHClient {
         int exitStatus = ((ChannelExec)channel).getExitStatus();
         channel.disconnect();
         return exitStatus;
+    }
+
+    private int transferBytes(InputStream in, OutputStream out, byte[] buffer, int length) throws IOException  {
+        int bytesRead = in.read(buffer, 0, (buffer.length <= length ? buffer.length : length));
+        if (bytesRead > 0) {
+            out.write(buffer, 0, bytesRead);
+        }
+        return bytesRead;
     }
 
     /**
