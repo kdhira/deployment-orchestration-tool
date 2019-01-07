@@ -7,7 +7,7 @@ import com.jcraft.jsch.Session;
 public class JSchPrivateKeyAuthentication implements JSchAuthentication {
 
     private String keyFile;
-    private String keyPass;
+    protected String keyPass;
 
     public JSchPrivateKeyAuthentication(String keyFile) {
         this(keyFile, null);

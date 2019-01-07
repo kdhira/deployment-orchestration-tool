@@ -4,7 +4,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 public class JSchPasswordAuthentication implements JSchAuthentication {
-    private String password;
+    protected String password;
 
     public JSchPasswordAuthentication(String password) {
         this.password = password;
@@ -19,5 +19,4 @@ public class JSchPasswordAuthentication implements JSchAuthentication {
     public void configureSession(Session session) {
         session.setPassword(password);
     }
-
 }
