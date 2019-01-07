@@ -15,13 +15,11 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 public class JSchClient implements SSHClient {
+    
+    private static final int BUFFER_SIZE = 1024;
 
     private JSch jsch;
     private Session session;
-
-    private String host;
-    private int port;
-    private String user;
 
     public JSchClient(String host, String user, JSchAuthentication auth) throws SSHException {
         this(host, 22, user, auth, new Properties());
@@ -35,9 +33,6 @@ public class JSchClient implements SSHClient {
         this(host, 22, user, auth, configuration);
     }
     public JSchClient(String host, int port, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
-        this.host = host;
-        this.port = port;
-        this.user = user;
         jsch = new JSch();
 
         auth.configureClient(jsch);
@@ -68,31 +63,20 @@ public class JSchClient implements SSHClient {
     public int push(String localPath, String remotePath) throws SSHException, IOException {
         // exec 'scp -t rfile' remotely
         String command = "scp  -t " + remotePath;
-        Channel channel;
-        try {
-            channel = session.openChannel("exec");
-        } catch (JSchException e) {
-            throw new SSHException("Could not create channel.", e);
-        }
-        ((ChannelExec) channel).setCommand(command);
+        Channel channel = openExecChannel(command);
 
         // get I/O streams for remote scp
         OutputStream out = channel.getOutputStream();
         InputStream in = channel.getInputStream();
-
-        try {
-            channel.connect();
-        } catch (JSchException e) {
-            throw new SSHException("Could not connect to channel.", e);
-        }
 
         checkAcknowledgement(in);
 
         File localFile = new File(localPath);
 
         // send "C0644 filesize filename", where filename should not include '/'
-        long filesize = localFile.length();
-        command = "C0644 " + filesize + " " + localFile.getName() + "\n";
+        long fileSize = localFile.length();
+        String fileName = localFile.getName();
+        command = "C0644 " + fileSize + " " + fileName + "\n";
         out.write(command.getBytes());
         out.flush();
 
@@ -100,33 +84,16 @@ public class JSchClient implements SSHClient {
 
         // send a content of lfile
         FileInputStream fis = new FileInputStream(localFile);
-        byte[] buf = new byte[1024];
+        byte[] buffer = new byte[BUFFER_SIZE];
 
-
-        long transfered = 0;
-        String lastMessage = "";
-
-
-        while (true) {
-            int bytesTransferred = transferBytes(fis, out, buf, buf.length);
-            if (bytesTransferred <= 0) {
-                System.out.println();
-                break;
-            }
-
-
-            transfered += bytesTransferred;
-            String next = (transfered * 100 / filesize) + "%";
-            eraseAndWrite(lastMessage, next);
-            lastMessage = next;
-        }
-
-        
+        int bytesTransferred;
+        do {
+            bytesTransferred = transferBytes(fis, out, buffer, buffer.length);
+        } while (bytesTransferred > 0);
 
         // send '\0'
         out.write(0);
         out.flush();
-
 
         out.close();
         checkAcknowledgement(in);
@@ -153,40 +120,26 @@ public class JSchClient implements SSHClient {
 
         // exec 'scp -f rfile' remotely
         String command = "scp -f " + remotePath;
-        Channel channel;
-        try {
-            channel = session.openChannel("exec");
-        } catch (JSchException e) {
-            throw new SSHException("Could not create channel.", e);
-        }
-        ((ChannelExec) channel).setCommand(command);
+        Channel channel = openExecChannel(command);
 
         // get I/O streams for remote scp
         OutputStream out = channel.getOutputStream();
         InputStream in = channel.getInputStream();
 
-        try {
-            channel.connect();
-        } catch (JSchException e) {
-            throw new SSHException("Could not connect to channel.", e);
-        }
-
-        byte[] buf = new byte[1024];
+        byte[] buffer = new byte[BUFFER_SIZE];
 
         // send '\0'
         out.write(0);
         out.flush();
 
-       
-        int c = in.read();
-        if (c != 'C') {
+        if (in.read() != 'C') {
             throw new SSHException("Expected start of file metadata, did not receive.");
         }
 
         // consume '0644 '
-        in.read(buf, 0, 5);
+        in.read(buffer, 0, 5);
 
-        long filesize = Long.valueOf(readUntil(in, ' '));
+        long fileSize = Long.valueOf(readUntil(in, ' '));
         String fileName = readUntil(in, '\n');
 
         // send '\0'
@@ -194,21 +147,15 @@ public class JSchClient implements SSHClient {
         out.flush();
 
         // read a content of lfile
-        FileOutputStream fos = new FileOutputStream(prefix == null ? localPath : prefix + fileName);
-        while (true) {
-            int nextRead = (buf.length < filesize ? buf.length : (int)filesize);
-            int bytesTransferred = transferBytes(in, fos, buf, nextRead);
-            if (bytesTransferred <= 0) {
-                break;
-            }
+        File localFile = new File(prefix == null ? localPath : prefix + fileName);
+        FileOutputStream fos = new FileOutputStream(localFile);
+        int bytesTransferred;
+        do {
+            int nextRead = (buffer.length < fileSize ? buffer.length : (int)fileSize);
+            bytesTransferred = transferBytes(in, fos, buffer, nextRead);
 
-            filesize -= bytesTransferred;
-            if (filesize == 0L) {
-                break;
-            }
-        }
-
-        // checkAcknowledgement(in);
+            fileSize -= bytesTransferred;
+        } while (bytesTransferred > 0 && fileSize > 0L);
 
         // send '\0'
         out.write(0);
@@ -222,8 +169,26 @@ public class JSchClient implements SSHClient {
         return getExitCodeAndDisconnect(channel);
     }
 
+    private Channel openExecChannel(String command) throws SSHException {
+        Channel channel;
+        try {
+            channel = session.openChannel("exec");
+        } catch (JSchException e) {
+            throw new SSHException("Could not create channel.", e);
+        }
+        ((ChannelExec) channel).setCommand(command);
+
+        try {
+            channel.connect();
+        } catch (JSchException e) {
+            throw new SSHException("Could not connect to channel.", e);
+        }
+
+        return channel;
+    }
+
     private int getExitCodeAndDisconnect(Channel channel) {
-        int exitStatus = channel.getExitStatus();
+        int exitStatus = ((ChannelExec)channel).getExitStatus();
         channel.disconnect();
         return exitStatus;
     }
@@ -268,14 +233,5 @@ public class JSchClient implements SSHClient {
         if (readAck(in) != 0) {
             throw new SSHException("Acknowledgement failed.");
         }
-    }
-
-    private void eraseAndWrite(String last, String next) {
-        StringBuilder sb = new StringBuilder();
-        for (char i : last.toCharArray()) {
-            sb.append("\010");
-        }
-        System.out.print(sb.toString());
-        System.out.print(next);
     }
 }
