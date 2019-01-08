@@ -1,9 +1,12 @@
 package com.kdhira.dot.job;
 
+import java.util.List;
+
 public abstract class AbstractJob implements Job {
 
     protected String jobId;
     private String jobDescription;
+    private List<Job> subJobs;
 
     public final String getJobId() {
         return jobId;
@@ -21,6 +24,14 @@ public abstract class AbstractJob implements Job {
     public final void setJobDescription(String jobDescription) {
         throwIfNotNull(this.jobDescription);
         this.jobDescription = jobDescription;
+    }
+
+    public final List<Job> getSubJobs() {
+        return subJobs;
+    }
+
+    public final void setSubJobs(List<Job> subJobs) {
+        this.subJobs = subJobs;
     }
 
     private void throwIfNotNull(Object obj) {

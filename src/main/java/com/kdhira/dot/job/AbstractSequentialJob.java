@@ -1,19 +1,21 @@
 package com.kdhira.dot.job;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractSequentialJob extends AbstractJob {
 
-    private List<Job> subJobs;
-
     public final boolean execute() {
         Map<Job, Boolean> statuses = new HashMap<Job, Boolean>();
 
+        if (getSubJobs() == null) {
+            setSubJobs(new ArrayList<Job>());
+        }
+
         statuses.put(this, run());
 
-        for (Job job : subJobs) {
+        for (Job job : getSubJobs()) {
             boolean status = job.execute();
             statuses.put(job, status);
         }
