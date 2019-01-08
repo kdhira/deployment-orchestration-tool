@@ -18,4 +18,5 @@ public class JSchAskPrivateKeyAuthentication extends JSchPrivateKeyAuthenticatio
         }
         super.configureClient(jsch);
     }
+
 }

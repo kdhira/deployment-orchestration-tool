@@ -9,4 +9,5 @@ public interface JSchAuthentication {
     void configureClient(JSch jsch) throws SSHException;
 
     void configureSession(Session session);
+
 }

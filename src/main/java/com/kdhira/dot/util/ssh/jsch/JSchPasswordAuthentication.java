@@ -5,6 +5,7 @@ import com.jcraft.jsch.Session;
 import com.kdhira.dot.util.ssh.SSHException;
 
 public class JSchPasswordAuthentication implements JSchAuthentication {
+
     protected String password;
 
     public JSchPasswordAuthentication(String password) {
@@ -20,4 +21,5 @@ public class JSchPasswordAuthentication implements JSchAuthentication {
     public void configureSession(Session session) {
         session.setPassword(password);
     }
+
 }

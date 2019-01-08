@@ -5,4 +5,5 @@ public interface ExecSSHAuthentication {
     String getPassword();
 
     String getKeyFile();
+
 }

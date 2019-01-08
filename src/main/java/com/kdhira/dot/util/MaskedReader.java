@@ -26,4 +26,5 @@ public class MaskedReader {
             throw new RuntimeException(e);
         }
     }
+
 }

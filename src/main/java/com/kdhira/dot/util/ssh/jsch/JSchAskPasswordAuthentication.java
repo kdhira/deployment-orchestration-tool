@@ -17,4 +17,5 @@ public class JSchAskPasswordAuthentication extends JSchPasswordAuthentication {
         }
         super.configureSession(session);
     }
+
 }
