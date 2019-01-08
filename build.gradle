@@ -32,6 +32,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.jcraft/jsch
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
+
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.23'
 }
 
 // Define the main class for the application
