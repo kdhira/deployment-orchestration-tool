@@ -16,8 +16,14 @@ public interface Job {
 
     void setSubJobs(List<Job> subjobs);
 
-    boolean execute();
+    boolean getParallelExecution();
+
+    void setParallelExecution(boolean parallelExecution);
+
+    boolean execute(boolean parallelExecution);
 
     boolean run();
+
+    boolean linkAndValidate();
 
 }
