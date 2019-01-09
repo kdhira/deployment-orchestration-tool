@@ -1,8 +1,8 @@
 package com.kdhira.dot.util.ssh.exec;
 
 import java.io.IOException;
-import java.io.InputStream;
 
+import com.kdhira.dot.util.ProcessSpawner;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
@@ -12,6 +12,8 @@ public class ExecSSHClient implements SSHClient {
     private int port;
     private String user;
     private ExecSSHAuthentication auth;
+
+    private ProcessSpawner processSpawner;
 
     public ExecSSHClient(String host, String user, ExecSSHAuthentication auth) throws SSHException, IOException {
         this(host, 22, user, auth);
@@ -68,34 +70,8 @@ public class ExecSSHClient implements SSHClient {
         return forkProcces(commandBuilder.toString());
     }
 
-    private int forkProcces(String command) throws SSHException, IOException {
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command("bash", "-c", command);
-        pb.redirectErrorStream(true);
-
-        Process p = pb.start();
-        InputStream in = p.getInputStream();
-
-        StringBuilder outputBuffer = new StringBuilder();
-        while (p.isAlive() || in.available() > 0) {
-            try {
-                while (in.available() > 0) {
-                    int i = in.read();
-                    if (i < 0) {
-                        break;
-                    }
-                    if (i == '\n') {
-                        System.out.println(outputBuffer.toString());
-                        outputBuffer = new StringBuilder();
-                    } else {
-                        outputBuffer.append((char) i);
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return p.exitValue();
+    private int forkProcces(String command) {
+        return processSpawner.spawnProcess(command);
     }
 
     @Override
