@@ -12,6 +12,7 @@ public abstract class AbstractJob implements Job {
     private String jobDescription;
     private List<Job> subJobs;
     private boolean parallelExecution;
+    private Job parentJob;
 
     public final String getJobId() {
         return jobId;
@@ -32,9 +33,6 @@ public abstract class AbstractJob implements Job {
     }
 
     public final List<Job> getSubJobs() {
-        if (subJobs == null) {
-            this.subJobs = new ArrayList<Job>();
-        }
         return subJobs;
     }
 
@@ -61,6 +59,7 @@ public abstract class AbstractJob implements Job {
             throw new JobValidationException("Failed to link and validate job");
         }
 
+        println("Running job '" + getJobId() + "'");
         if (!run()) {
             return false;
         }
@@ -95,6 +94,34 @@ public abstract class AbstractJob implements Job {
         while (threads.values().stream().filter((t) -> t.isAlive()).count() > 0);
 
         return !statuses.containsValue(new Boolean(false));
+    }
+
+    public boolean linkAndValidate() {
+        if (subJobs == null) {
+            this.subJobs = new ArrayList<Job>();
+        }
+
+        for (Job job : subJobs) {
+            job.linkParent(this);
+        }
+
+        return true;
+    }
+
+    public Job getParent() {
+        return parentJob;
+    }
+
+    public void linkParent(Job parentJob) {
+        this.parentJob = parentJob;
+    }
+
+    public String getFQJI() {
+        return (getParent() != null ? parentJob.getFQJI() + "|" : "") + getJobId(); 
+    }
+
+    public void println(String s) {
+        System.out.println("[" + getFQJI() + "]\t" + s);
     }
 
 }

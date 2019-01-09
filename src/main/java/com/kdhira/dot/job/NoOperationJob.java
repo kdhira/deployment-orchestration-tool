@@ -6,13 +6,8 @@ public final class NoOperationJob extends AbstractJob implements NoOperationJobS
 
     @Override
     public boolean run() {
-        System.out.println("Job '" + getJobId() + "' => No Operation");
         return true;
     }
 
-    @Override
-    public boolean linkAndValidate() {
-        return true;
-    }
 
 }

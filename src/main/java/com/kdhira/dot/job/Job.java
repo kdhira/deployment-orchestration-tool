@@ -26,4 +26,10 @@ public interface Job {
 
     boolean linkAndValidate();
 
+    String getFQJI();
+
+    void linkParent(Job parentJob);
+
+    void println(String s);
+
 }
