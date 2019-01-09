@@ -23,7 +23,7 @@ public class YamlReader<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public <R> List<T> readDocument(String yamlLocation, Class<? extends T> documentRoot) throws FileNotFoundException {
+    public List<T> readDocument(String yamlLocation, Class<? extends T> documentRoot) throws FileNotFoundException {
         Constructor yamlConstructor = new Constructor(documentRoot);
 
         for (TypeDescription td : typeDescriptions) {
@@ -40,4 +40,5 @@ public class YamlReader<T> {
 
         return yamlJobs;
     }
+
 }
