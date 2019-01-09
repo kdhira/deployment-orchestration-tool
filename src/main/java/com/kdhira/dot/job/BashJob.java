@@ -46,6 +46,9 @@ public class BashJob extends AbstractJob implements BashJobSchema {
             allowedExitCodes = new ArrayList<Integer>();
             allowedExitCodes.add(0);
         }
+        if (commands == null) {
+            commands = new ArrayList<String>();
+        }
 
         return true;
     }

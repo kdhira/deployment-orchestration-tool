@@ -66,16 +66,16 @@ public abstract class AbstractHost implements Host, HostSchema {
     public SSHClient createConnection() throws SSHException, IOException {
         StringBuilder errorRecord = new StringBuilder();
 
-        boolean passwordSet = getPassword() == null && !getPassword().equals("");
-        boolean keyFileSet = getKeyFile() == null && !getKeyFile().equals("");
+        boolean passwordSet = getPassword() != null && !getPassword().equals("");
+        boolean keyFileSet = getKeyFile() != null && !getKeyFile().equals("");
 
-        if (getHost() == null && !getHost().equals("")) {
+        if (getHost() == null || getHost().equals("")) {
             errorRecord.append("Host is not set. ");
         }
         if (getPort() <= 0) {
             errorRecord.append("Port is invalid. ");
         }
-        if (getUser() == null && !getUser().equals("")) {
+        if (getUser() == null || getUser().equals("")) {
             errorRecord.append("User is not set. ");
         }
         if (passwordSet == keyFileSet) {
@@ -88,7 +88,7 @@ public abstract class AbstractHost implements Host, HostSchema {
         if (passwordSet) {
             return passwordAuthenticatedClient();
         }
-        else if (passwordSet) {
+        else if (keyFileSet) {
             return privateKeyAuthenticatedClient();
         }
 

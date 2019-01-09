@@ -25,6 +25,8 @@ public class ExecSSHClient implements SSHClient {
         this.user = user;
         this.auth = auth;
 
+        processSpawner = new ProcessSpawner();
+
         if (execute(":") != 0) {
             throw new SSHException("Could not connect to host");
         }
