@@ -19,7 +19,7 @@ public class YamlReader<T> {
         typeDescriptions = new ArrayList<TypeDescription>();
     }
 
-    public void registerType(Class<? extends Object> subclass) {
+    public void registerType(Class<?> subclass) {
         typeDescriptions.add(new TypeDescription(subclass, new Tag("!" + subclass.getSimpleName())));
     }
 

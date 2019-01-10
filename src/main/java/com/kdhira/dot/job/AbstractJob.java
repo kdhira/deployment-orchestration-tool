@@ -6,21 +6,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.kdhira.dot.resource.Resource;
+
 public abstract class AbstractJob implements Job {
 
-    protected String jobId;
+    protected String id;
     private String jobDescription;
     private List<Job> subJobs;
     private boolean parallelExecution;
     private Job parentJob;
 
-    public final String getJobId() {
-        return jobId;
+    public AbstractJob() {
+        subJobs = new ArrayList<Job>();
     }
 
-    public final void setJobId(String jobId) {
-        throwIfNotNull(this.jobId);
-        this.jobId = jobId;
+    public final String getId() {
+        return id;
+    }
+
+    public final void setId(String id) {
+        throwIfNotNull(this.id);
+        this.id = id;
     }
 
     public final String getJobDescription() {
@@ -59,7 +65,7 @@ public abstract class AbstractJob implements Job {
             throw new JobValidationException("Failed to link and validate job");
         }
 
-        println("Running job '" + getJobId() + "'");
+        println("Running job '" + getId() + "'");
         if (!run()) {
             return false;
         }
@@ -117,8 +123,18 @@ public abstract class AbstractJob implements Job {
     }
 
     public String getFQJI() {
-        return (getParent() != null ? parentJob.getFQJI() + "|" : "") + getJobId(); 
+        return (getParent() != null ? parentJob.getFQJI() + "|" : "") + getId(); 
     }
+
+    public void link(Map<String, Resource> sharedResources) {
+        this.linkResources(sharedResources);
+
+        for (Job job : subJobs) {
+            job.link(sharedResources);
+        }
+    }
+
+    protected abstract void linkResources(Map<String, Resource> sharedResources);
 
     public void println(String s) {
         System.out.println("[" + getFQJI() + "]\t" + s);

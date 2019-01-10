@@ -2,11 +2,13 @@ package com.kdhira.dot.job;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.kdhira.dot.resource.Host;
+import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.schema.SSHJobSchema;
+import com.kdhira.dot.util.Resources;
 import com.kdhira.dot.util.ssh.AbstractSSHCommand;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
@@ -66,6 +68,11 @@ public class SSHJob extends AbstractJob implements SSHJobSchema {
         }
 
         return true;
+    }
+
+    @Override
+    protected void linkResources(Map<String, Resource> sharedResources) {
+        setConnection(Resources.lookup(sharedResources, getConnection()));
     }
 
 }

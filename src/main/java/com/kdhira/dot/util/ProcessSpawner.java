@@ -2,10 +2,11 @@ package com.kdhira.dot.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Consumer;
 
 public class ProcessSpawner {
 
-    public int spawnProcess(String command) {
+    public int spawnProcess(String command, Consumer<String> outputRelay) {
         ProcessBuilder pb = new ProcessBuilder();
         pb.command("bash", "-c", command);
         pb.redirectErrorStream(true);
@@ -34,6 +35,10 @@ public class ProcessSpawner {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int spawnProcess(String command) {
+        return spawnProcess(command, this::println);
     }
 
     private void println(String s) {

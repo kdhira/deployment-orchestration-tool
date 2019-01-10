@@ -1,12 +1,12 @@
 package com.kdhira.dot.job;
 
 import java.util.List;
+import java.util.Map;
 
-public interface Job {
+import com.kdhira.dot.resource.Resource;
+import com.kdhira.dot.schema.Identifiable;
 
-    String getJobId();
-
-    void setJobId(String jobId);
+public interface Job extends Identifiable {
 
     String getJobDescription();
 
@@ -27,6 +27,8 @@ public interface Job {
     boolean linkAndValidate();
 
     String getFQJI();
+
+    void link(Map<String, Resource> sharedResources);
 
     void linkParent(Job parentJob);
 

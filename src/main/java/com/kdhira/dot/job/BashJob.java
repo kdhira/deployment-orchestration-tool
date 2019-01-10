@@ -2,7 +2,9 @@ package com.kdhira.dot.job;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.schema.BashJobSchema;
 import com.kdhira.dot.util.ProcessSpawner;
 
@@ -51,6 +53,11 @@ public class BashJob extends AbstractJob implements BashJobSchema {
         }
 
         return true;
+    }
+
+    @Override
+    protected void linkResources(Map<String, Resource> sharedResources) {
+        
     }
 
 }

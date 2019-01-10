@@ -1,7 +1,5 @@
 package com.kdhira.dot.util.ssh;
 
-import java.io.IOException;
-
 import com.kdhira.dot.schema.SSHPushPullSchema;
 
 public abstract class AbstractSSHPushPull extends AbstractSSHCommand implements SSHPushPullSchema {

@@ -2,18 +2,28 @@ package com.kdhira.dot.resource;
 
 import java.io.IOException;
 
+import com.kdhira.dot.job.Job;
 import com.kdhira.dot.schema.HostSchema;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
 public abstract class AbstractHost implements Host, HostSchema {
 
+    private String id;
     private String host;
     private int port = 22;
     private String user;
     private String password;
     private String keyFile;
     private String keyPass;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public final String getHost() {
         return host;
