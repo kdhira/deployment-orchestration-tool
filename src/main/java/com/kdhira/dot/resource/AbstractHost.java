@@ -2,7 +2,6 @@ package com.kdhira.dot.resource;
 
 import java.io.IOException;
 
-import com.kdhira.dot.job.Job;
 import com.kdhira.dot.schema.HostSchema;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;

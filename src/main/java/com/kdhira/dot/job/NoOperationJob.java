@@ -8,7 +8,7 @@ import com.kdhira.dot.schema.NoOperationJobSchema;
 public final class NoOperationJob extends AbstractJob implements NoOperationJobSchema {
 
     @Override
-    public boolean run() {
+    public boolean runJob() {
         return true;
     }
 

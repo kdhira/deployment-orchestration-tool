@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.kdhira.dot.resource.Resource;
-import com.kdhira.dot.schema.Identifiable;
 
-public interface Job extends Identifiable {
+public interface Job extends Resource {
 
     String getJobDescription();
 
@@ -20,18 +19,18 @@ public interface Job extends Identifiable {
 
     void setParallelExecution(boolean parallelExecution);
 
-    boolean execute(boolean parallelExecution);
+    Job getParent();
 
-    boolean run();
-
-    boolean linkAndValidate();
+    void setParent(Job parent);
 
     String getFQJI();
 
+    boolean execute(boolean parallelExecution);
+
     void link(Map<String, Resource> sharedResources);
 
-    void linkParent(Job parentJob);
+    void validate() throws JobValidationException;
 
-    void println(String s);
+    
 
 }

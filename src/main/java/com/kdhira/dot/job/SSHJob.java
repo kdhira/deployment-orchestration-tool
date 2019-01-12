@@ -18,8 +18,12 @@ public class SSHJob extends AbstractJob implements SSHJobSchema {
     private List<AbstractSSHCommand> commands;
     private Host connection;
 
+    public SSHJob() {
+        commands = new ArrayList<AbstractSSHCommand>();
+    }
+
     @Override
-    public boolean run() {
+    public boolean runJob() {
         try (SSHClient ssh = getConnection().createConnection()) {
             for (AbstractSSHCommand command : commands) {
                 command.run(ssh);
@@ -53,21 +57,12 @@ public class SSHJob extends AbstractJob implements SSHJobSchema {
     }
 
     @Override
-    public boolean linkAndValidate() {
-        if (!super.linkAndValidate()) {
-            return false;
-        }
-        if (commands == null) {
-            commands = new ArrayList<AbstractSSHCommand>();
-        }
-
+    public void validate() throws JobValidationException {
         try {
             getConnection().createConnection();
         } catch (SSHException | IOException | IllegalStateException e) {
             throw new JobValidationException("Connection to host could not be established", e);
         }
-
-        return true;
     }
 
     @Override

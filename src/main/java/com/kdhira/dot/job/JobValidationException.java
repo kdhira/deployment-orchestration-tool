@@ -1,6 +1,6 @@
 package com.kdhira.dot.job;
 
-public class JobValidationException extends RuntimeException {
+public class JobValidationException extends Exception {
 
     private static final long serialVersionUID = 1L;
 

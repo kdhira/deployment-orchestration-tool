@@ -1,6 +1,7 @@
 package com.kdhira.dot.job;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -10,8 +11,16 @@ import com.kdhira.dot.util.ProcessSpawner;
 
 public class BashJob extends AbstractJob implements BashJobSchema {
 
+    private final static Integer[] ALLOWED_EXIT_CODES = {0};
+
     private List<String> commands;
     private List<Integer> allowedExitCodes;
+
+    public BashJob() {
+        commands = new ArrayList<String>();
+        allowedExitCodes = new ArrayList<Integer>();
+        allowedExitCodes.addAll(Arrays.asList(ALLOWED_EXIT_CODES));
+    }
 
     @Override
     public List<String> getCommands() {
@@ -24,7 +33,7 @@ public class BashJob extends AbstractJob implements BashJobSchema {
     }
 
     @Override
-    public boolean run() {
+    public boolean runJob() {
         ProcessSpawner processSpawner = new ProcessSpawner();
         for (String command : commands) {
             println("Executing `" + command + "`");
@@ -36,22 +45,6 @@ public class BashJob extends AbstractJob implements BashJobSchema {
                 return false;
             }
         }
-        return true;
-    }
-
-    @Override
-    public boolean linkAndValidate() {
-        if (!super.linkAndValidate()) {
-            return false;
-        }
-        if (allowedExitCodes == null) {
-            allowedExitCodes = new ArrayList<Integer>();
-            allowedExitCodes.add(0);
-        }
-        if (commands == null) {
-            commands = new ArrayList<String>();
-        }
-
         return true;
     }
 

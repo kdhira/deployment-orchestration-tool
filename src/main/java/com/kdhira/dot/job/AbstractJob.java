@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import com.kdhira.dot.resource.Resource;
+import com.kdhira.dot.util.Resources;
 
 public abstract class AbstractJob implements Job {
 
@@ -14,59 +16,65 @@ public abstract class AbstractJob implements Job {
     private String jobDescription;
     private List<Job> subJobs;
     private boolean parallelExecution;
-    private Job parentJob;
+    private Job parent;
 
     public AbstractJob() {
         subJobs = new ArrayList<Job>();
     }
 
+    @Override
     public final String getId() {
         return id;
     }
 
+    @Override
     public final void setId(String id) {
         throwIfNotNull(this.id);
         this.id = id;
     }
 
+    @Override
     public final String getJobDescription() {
         return jobDescription;
     }
 
+    @Override
     public final void setJobDescription(String jobDescription) {
         throwIfNotNull(this.jobDescription);
         this.jobDescription = jobDescription;
     }
 
+    @Override
     public final List<Job> getSubJobs() {
         return subJobs;
     }
 
+    @Override
     public final void setSubJobs(List<Job> subJobs) {
         this.subJobs = subJobs;
     }
 
+    @Override
     public final boolean getParallelExecution() {
         return parallelExecution;
     }
 
+    @Override
     public final void setParallelExecution(boolean parallelExecution) {
         this.parallelExecution = parallelExecution;
     }
 
-    private void throwIfNotNull(Object obj) {
-        if (obj != null) {
-            throw new IllegalStateException("Implementation does not allow resetting of this variable");
-        }
-    }
-
+    @Override
     public final boolean execute(boolean parallelExecution) {
-        if (!linkAndValidate()) {
-            throw new JobValidationException("Failed to link and validate job");
+        try {
+            validate();
+        } catch (JobValidationException e) {
+            e.printStackTrace();
+            return false;
         }
 
         println("Running job '" + getId() + "'");
-        if (!run()) {
+        if (!runJob()) {
             return false;
         }
 
@@ -81,6 +89,40 @@ public abstract class AbstractJob implements Job {
         }
 
         return true;
+    }
+
+    @Override
+    public final Job getParent() {
+        return parent;
+    }
+
+    @Override
+    public final void setParent(Job parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public String getFQJI() {
+        return (getParent() != null ? parent.getFQJI() + "|" : "") + getId(); 
+    }
+
+    @Override
+    public final void link(Map<String, Resource> sharedResources) {
+        this.linkResources(sharedResources);
+
+        subJobs = subJobs.stream()
+                .map((job) -> Resources.lookup(sharedResources, job))
+                .collect(Collectors.toList());
+
+        for (Job job : subJobs) {
+            job.setParent(this);
+            job.link(sharedResources);
+        }
+    }
+
+    @Override
+    public void validate() throws JobValidationException {
+
     }
 
     private final boolean executeInParallel() {
@@ -99,45 +141,21 @@ public abstract class AbstractJob implements Job {
 
         while (threads.values().stream().filter((t) -> t.isAlive()).count() > 0);
 
-        return !statuses.containsValue(new Boolean(false));
+        return !statuses.containsValue(false);
     }
 
-    public boolean linkAndValidate() {
-        if (subJobs == null) {
-            this.subJobs = new ArrayList<Job>();
-        }
-
-        for (Job job : subJobs) {
-            job.linkParent(this);
-        }
-
-        return true;
-    }
-
-    public Job getParent() {
-        return parentJob;
-    }
-
-    public void linkParent(Job parentJob) {
-        this.parentJob = parentJob;
-    }
-
-    public String getFQJI() {
-        return (getParent() != null ? parentJob.getFQJI() + "|" : "") + getId(); 
-    }
-
-    public void link(Map<String, Resource> sharedResources) {
-        this.linkResources(sharedResources);
-
-        for (Job job : subJobs) {
-            job.link(sharedResources);
+    private void throwIfNotNull(Object obj) {
+        if (obj != null) {
+            throw new IllegalStateException("Implementation does not allow resetting of this variable");
         }
     }
 
-    protected abstract void linkResources(Map<String, Resource> sharedResources);
-
-    public void println(String s) {
+    protected void println(String s) {
         System.out.println("[" + getFQJI() + "]\t" + s);
     }
+
+    protected abstract boolean runJob();
+
+    protected abstract void linkResources(Map<String, Resource> sharedResources);
 
 }
