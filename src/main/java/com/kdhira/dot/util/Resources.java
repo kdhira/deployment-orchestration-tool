@@ -12,7 +12,6 @@ public class Resources {
             if (resource.getId() != null && !resource.getId().equals("")) {
                 if (resources.containsKey(resource.getId())) {
                     return (T)resources.get(resource.getId());
-                    
                 }
             }
         }

@@ -6,7 +6,7 @@ public class SSHPull extends AbstractSSHPushPull {
 
     @Override
     public int run(SSHClient client) throws SSHException, IOException {
-		return client.pull(getRemote(), getLocal());
-	}
+        return client.pull(getRemote(), getLocal());
+    }
 
 }

@@ -17,7 +17,7 @@ import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
 public class JSchClient implements SSHClient {
-    
+
     private static final int BUFFER_SIZE = 1024;
 
     private JSch jsch;
@@ -34,6 +34,7 @@ public class JSchClient implements SSHClient {
     public JSchClient(String host, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
         this(host, 22, user, auth, configuration);
     }
+
     public JSchClient(String host, int port, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
         jsch = new JSch();
 

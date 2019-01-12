@@ -31,6 +31,6 @@ public interface Job extends Resource {
 
     void validate() throws JobValidationException;
 
-    
+
 
 }

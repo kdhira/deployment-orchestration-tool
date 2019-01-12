@@ -22,5 +22,5 @@ public class RootResource implements RootResourceSchema {
     public void setResources(List<Resource> resources) {
         this.resources = resources;
     }
-    
+
 }

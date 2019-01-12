@@ -14,8 +14,7 @@ public final class NoOperationJob extends AbstractJob implements NoOperationJobS
 
     @Override
     protected void linkResources(Map<String, Resource> sharedResources) {
-        
-    }
 
+    }
 
 }

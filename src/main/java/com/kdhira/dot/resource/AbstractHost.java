@@ -93,7 +93,7 @@ public abstract class AbstractHost implements Host, HostSchema {
         if (errorRecord.toString().length() > 0) {
             throw new IllegalStateException(errorRecord.toString());
         }
-        
+
         if (passwordSet) {
             return passwordAuthenticatedClient();
         }
@@ -105,7 +105,7 @@ public abstract class AbstractHost implements Host, HostSchema {
     }
 
     protected abstract SSHClient passwordAuthenticatedClient() throws SSHException, IOException;
-    
+
     protected abstract SSHClient privateKeyAuthenticatedClient() throws SSHException, IOException;
 
 }
