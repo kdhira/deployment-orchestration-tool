@@ -5,7 +5,7 @@ import java.util.Map;
 import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.schema.NoOperationJobSchema;
 
-public final class NoOperationJob extends AbstractJob implements NoOperationJobSchema {
+public final class JobManifest extends AbstractJob implements NoOperationJobSchema {
 
     @Override
     public boolean runJob() {
