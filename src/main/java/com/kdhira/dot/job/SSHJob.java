@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.kdhira.dot.resource.Host;
+import com.kdhira.dot.resource.HostComponent;
 import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.schema.SSHJobSchema;
 import com.kdhira.dot.util.Resources;
@@ -13,7 +14,7 @@ import com.kdhira.dot.util.ssh.AbstractSSHCommand;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
-public class SSHJob extends AbstractJob implements SSHJobSchema {
+public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponent {
 
     private List<AbstractSSHCommand> commands;
     private Host connection;

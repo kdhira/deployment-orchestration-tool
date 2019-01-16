@@ -2,7 +2,7 @@ package com.kdhira.dot.resource;
 
 import com.kdhira.dot.resource.Host;
 
-public interface HostResource extends Resource {
+public interface HostComponent extends Resource {
 
     Host getConnection();
 
