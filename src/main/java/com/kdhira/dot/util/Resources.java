@@ -7,15 +7,11 @@ import com.kdhira.dot.resource.Resource;
 public class Resources {
 
     @SuppressWarnings("unchecked")
-    public static <T extends Resource> T lookup(Map<String, Resource> resources, T resource) throws ClassCastException {
-        if (resource != null) {
-            if (resource.getId() != null && !resource.getId().equals("")) {
-                if (resources.containsKey(resource.getId())) {
-                    return (T)resources.get(resource.getId());
-                }
-            }
+    public static <T extends Resource> T lookup(Map<String, Resource> resources, T defaultResource) throws ClassCastException {
+        if (defaultResource != null && defaultResource.getId() != null && !defaultResource.getId().equals("")) {
+            return (T)resources.getOrDefault(defaultResource.getId(), defaultResource);
         }
-        return resource;
+        return defaultResource;
     }
 
 }
