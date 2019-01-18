@@ -4,8 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
+/**
+ * Class that spawns subprocesses using {@link ProcessBuilder}.
+ * @author Kevin Hira
+ */
 public class ProcessSpawner {
 
+    /**
+     * Spawns a process.
+     * @param command command to execute
+     * @param outputRelay method to consume command output
+     * @return exit code of process
+     */
     public int spawnProcess(String command, Consumer<String> outputRelay) {
         ProcessBuilder pb = new ProcessBuilder();
         pb.command("bash", "-c", command);
@@ -37,13 +47,17 @@ public class ProcessSpawner {
         }
     }
 
+    /**
+     * Spawns a process.
+     * @param command command to execute
+     * @return exit code of process
+     */
     public int spawnProcess(String command) {
         return spawnProcess(command, this::println);
     }
 
     private void println(String s) {
         System.out.println(s);
-
     }
 
 }
