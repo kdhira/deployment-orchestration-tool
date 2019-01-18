@@ -13,4 +13,9 @@ public class SSHPull extends AbstractSSHPushPull {
         return client.pull(getRemote(), getLocal());
     }
 
+    @Override
+    public String commandString() {
+        return "scp: Retrieving '" + getRemote() + "'";
+    }
+
 }

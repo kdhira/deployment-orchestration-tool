@@ -25,12 +25,24 @@ public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponent {
 
     @Override
     public boolean runJob() {
+        SSHRunnable currentCommand = null;
         try (SSHClient ssh = getConnection().createConnection()) {
             for (SSHRunnable command : commands) {
-                command.run(ssh);
+                currentCommand = command;
+
+                println(command.commandString());
+                int exitCode = command.run(ssh);
+                println(command.commandString() + " => Exit code: " + exitCode);
+
+                if (exitCode > 0) {
+                    return false;
+                }
             }
         }
         catch (SSHException | IOException e) {
+            if (currentCommand != null) {
+                println(currentCommand.commandString() + " => Error occured!");
+            }
             e.printStackTrace();
             return false;
         }

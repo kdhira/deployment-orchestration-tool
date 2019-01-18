@@ -27,4 +27,9 @@ public class SSHCommand implements SSHCommandSchema, SSHRunnable {
         this.command = command;
     }
 
+    @Override
+    public String commandString() {
+        return "ssh: " + getCommand();
+    }
+
 }
