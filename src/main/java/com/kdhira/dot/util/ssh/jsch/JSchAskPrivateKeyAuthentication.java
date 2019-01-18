@@ -4,6 +4,10 @@ import com.jcraft.jsch.JSch;
 import com.kdhira.dot.util.MaskedReader;
 import com.kdhira.dot.util.ssh.SSHException;
 
+/**
+ * Authentication implementation which sets up private key authentication, asking for passphrase.
+ * @author Kevin Hira
+ */
 public class JSchAskPrivateKeyAuthentication extends JSchPrivateKeyAuthentication {
 
     public JSchAskPrivateKeyAuthentication(String keyFile) {

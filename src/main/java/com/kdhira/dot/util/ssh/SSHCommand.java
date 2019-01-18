@@ -4,7 +4,11 @@ import java.io.IOException;
 
 import com.kdhira.dot.schema.SSHCommandSchema;
 
-public class SSHCommand extends AbstractSSHCommand implements SSHCommandSchema {
+/**
+ * Implementation for running SSH commands remotely.
+ * @author Kevin Hira
+ */
+public class SSHCommand implements SSHCommandSchema, SSHRunnable {
 
     private String command;
 

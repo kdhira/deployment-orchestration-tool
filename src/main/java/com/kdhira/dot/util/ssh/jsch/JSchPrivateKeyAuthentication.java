@@ -5,6 +5,10 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.kdhira.dot.util.ssh.SSHException;
 
+/**
+ * Authentication implementation which sets up private key authentication.
+ * @author Kevin Hira
+ */
 public class JSchPrivateKeyAuthentication implements JSchAuthentication {
 
     private String keyFile;

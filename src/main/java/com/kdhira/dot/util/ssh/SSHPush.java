@@ -2,6 +2,10 @@ package com.kdhira.dot.util.ssh;
 
 import java.io.IOException;
 
+/**
+ * Implementation for sending files to remote hosts.
+ * @author Kevin Hira
+ */
 public class SSHPush extends AbstractSSHPushPull {
 
     @Override

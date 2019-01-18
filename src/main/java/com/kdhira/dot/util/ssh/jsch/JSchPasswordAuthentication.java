@@ -4,6 +4,10 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.kdhira.dot.util.ssh.SSHException;
 
+/**
+ * Authentication implementation which sets up password authentication.
+ * @author Kevin Hira
+ */
 public class JSchPasswordAuthentication implements JSchAuthentication {
 
     protected String password;

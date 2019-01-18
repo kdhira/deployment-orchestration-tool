@@ -1,5 +1,9 @@
 package com.kdhira.dot.util.ssh.exec;
 
+/**
+ * Authentication implementation for username-password authentication.
+ * @author Kevin Hira
+ */
 public class ExecSSHPasswordAuthentication implements ExecSSHAuthentication {
 
     protected String password;

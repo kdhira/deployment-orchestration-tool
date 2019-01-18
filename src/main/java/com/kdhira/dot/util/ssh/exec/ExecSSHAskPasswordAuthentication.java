@@ -2,6 +2,10 @@ package com.kdhira.dot.util.ssh.exec;
 
 import com.kdhira.dot.util.MaskedReader;
 
+/**
+ * Authentication implementation which asks user for password when needed (stdin).
+ * @author Kevin Hira
+ */
 public class ExecSSHAskPasswordAuthentication extends ExecSSHPasswordAuthentication {
 
     public ExecSSHAskPasswordAuthentication() {

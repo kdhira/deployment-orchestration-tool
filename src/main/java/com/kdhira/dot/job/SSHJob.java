@@ -10,23 +10,23 @@ import com.kdhira.dot.resource.HostComponent;
 import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.schema.SSHJobSchema;
 import com.kdhira.dot.util.Resources;
-import com.kdhira.dot.util.ssh.AbstractSSHCommand;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
+import com.kdhira.dot.util.ssh.SSHRunnable;
 
 public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponent {
 
-    private List<AbstractSSHCommand> commands;
+    private List<SSHRunnable> commands;
     private Host connection;
 
     public SSHJob() {
-        commands = new ArrayList<AbstractSSHCommand>();
+        commands = new ArrayList<SSHRunnable>();
     }
 
     @Override
     public boolean runJob() {
         try (SSHClient ssh = getConnection().createConnection()) {
-            for (AbstractSSHCommand command : commands) {
+            for (SSHRunnable command : commands) {
                 command.run(ssh);
             }
         }
@@ -38,12 +38,12 @@ public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponent {
     }
 
     @Override
-    public List<AbstractSSHCommand> getCommmands() {
+    public List<SSHRunnable> getCommmands() {
         return commands;
     }
 
     @Override
-    public void setCommands(List<AbstractSSHCommand> commands) {
+    public void setCommands(List<SSHRunnable> commands) {
         this.commands = commands;
     }
 

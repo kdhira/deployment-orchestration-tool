@@ -2,12 +2,12 @@ package com.kdhira.dot.schema;
 
 import java.util.List;
 
-import com.kdhira.dot.util.ssh.AbstractSSHCommand;
+import com.kdhira.dot.util.ssh.SSHRunnable;
 
 public interface SSHJobSchema {
 
-    List<AbstractSSHCommand> getCommmands();
+    List<SSHRunnable> getCommmands();
 
-    void setCommands(List<AbstractSSHCommand> sshCommands);
+    void setCommands(List<SSHRunnable> sshCommands);
 
 }

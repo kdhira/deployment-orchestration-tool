@@ -6,6 +6,10 @@ import com.kdhira.dot.util.ProcessSpawner;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
+/**
+ * SSH client implemented using ssh processes.
+ * @author Kevin Hira
+ */
 public class ExecSSHClient implements SSHClient {
 
     private String host;
@@ -34,42 +38,42 @@ public class ExecSSHClient implements SSHClient {
 
     @Override
     public int push(String localPath, String remotePath) throws SSHException, IOException {
-        StringBuilder commandBuilder = generateBaseCommand("scp");
+        String executeCommand = buildCommand(
+            generateBaseCommand("scp"),
+            localPath,
+            " ",
+            getConnectionString(),
+            ":",
+            remotePath
+        );
 
-        commandBuilder
-                .append(localPath)
-                .append(" ")
-                .append(getConnectionString())
-                .append(":")
-                .append(remotePath);
-
-        return forkProcces(commandBuilder.toString());
+        return forkProcces(executeCommand);
     }
 
     @Override
     public int pull(String remotePath, String localPath) throws SSHException, IOException {
-        StringBuilder commandBuilder = generateBaseCommand("scp");
+        String executeCommand = buildCommand(
+            generateBaseCommand("scp"),
+            getConnectionString(),
+            ":",
+            remotePath,
+            " ",
+            localPath
+        );
 
-        commandBuilder
-                .append(getConnectionString())
-                .append(":")
-                .append(remotePath)
-                .append(" ")
-                .append(localPath);
-
-        return forkProcces(commandBuilder.toString());
+        return forkProcces(executeCommand);
     }
 
     @Override
     public int execute(String command) throws SSHException, IOException {
-        StringBuilder commandBuilder = generateBaseCommand("ssh");
+        String executeCommand = buildCommand(
+            generateBaseCommand("ssh"),
+            getConnectionString(),
+            " ",
+            command
+        );
 
-        commandBuilder
-                .append(getConnectionString())
-                .append(" ")
-                .append(command);
-
-        return forkProcces(commandBuilder.toString());
+        return forkProcces(executeCommand);
     }
 
     private int forkProcces(String command) {
@@ -121,7 +125,7 @@ public class ExecSSHClient implements SSHClient {
         return commandBuilder.toString();
     }
 
-    private StringBuilder generateBaseCommand(String baseCommand) {
+    private String generateBaseCommand(String baseCommand) {
         StringBuilder commandBuilder = new StringBuilder();
         commandBuilder
                 .append(passwordInfo())
@@ -129,7 +133,17 @@ public class ExecSSHClient implements SSHClient {
                 .append(identityInfo())
                 .append(portInfo());
 
-        return commandBuilder;
+        return commandBuilder.toString();
+    }
+
+    private String buildCommand(String... strings) {
+        StringBuilder builder = new StringBuilder();
+
+        for (String s : strings) {
+            builder.append(s);
+        }
+
+        return builder.toString();
     }
 
 }

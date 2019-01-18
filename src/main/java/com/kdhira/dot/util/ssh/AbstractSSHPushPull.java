@@ -2,7 +2,11 @@ package com.kdhira.dot.util.ssh;
 
 import com.kdhira.dot.schema.SSHPushPullSchema;
 
-public abstract class AbstractSSHPushPull extends AbstractSSHCommand implements SSHPushPullSchema {
+/**
+ * Schema implementation for SSH push and pull commands.
+ * @author Kevin Hira
+ */
+public abstract class AbstractSSHPushPull implements SSHPushPullSchema, SSHRunnable {
 
     private String local;
     private String remote;

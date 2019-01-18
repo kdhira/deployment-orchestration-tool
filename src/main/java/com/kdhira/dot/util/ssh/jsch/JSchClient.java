@@ -16,6 +16,10 @@ import com.jcraft.jsch.Session;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
+/**
+ * SSH client implementation using JSch (Jcraft).
+ * @author Kevin Hira
+ */
 public class JSchClient implements SSHClient {
 
     private static final int BUFFER_SIZE = 1024;
@@ -63,6 +67,7 @@ public class JSchClient implements SSHClient {
         }
     }
 
+    @Override
     public int push(String localPath, String remotePath) throws SSHException, IOException {
         // exec 'scp -t rfile' remotely
         String command = "scp  -t " + remotePath;
@@ -106,6 +111,7 @@ public class JSchClient implements SSHClient {
         return getExitCodeAndDisconnect(channel);
     }
 
+    @Override
     public int pull(String remotePath, String localPath) throws SSHException, IOException {
         String prefix = null;
 
@@ -164,6 +170,7 @@ public class JSchClient implements SSHClient {
         return getExitCodeAndDisconnect(channel);
     }
 
+    @Override
     public int execute(String command) throws SSHException, IOException {
         Channel channel = openExecChannel(command);
         StringBuilder outputBuffer = new StringBuilder();

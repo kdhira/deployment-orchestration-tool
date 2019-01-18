@@ -1,5 +1,9 @@
 package com.kdhira.dot.util.ssh.exec;
 
+/**
+ * Authentication implementation for private key authentication.
+ * @author Kevin Hira
+ */
 public class ExecSSHPrivateKeyAuthentication implements ExecSSHAuthentication {
 
     private String keyFile;

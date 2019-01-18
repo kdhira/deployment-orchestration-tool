@@ -3,6 +3,10 @@ package com.kdhira.dot.util.ssh.jsch;
 import com.jcraft.jsch.Session;
 import com.kdhira.dot.util.MaskedReader;
 
+/**
+ * Authentication implementation which sets up password authentication, asking for password.
+ * @author Kevin Hira
+ */
 public class JSchAskPasswordAuthentication extends JSchPasswordAuthentication {
 
     public JSchAskPasswordAuthentication() {
