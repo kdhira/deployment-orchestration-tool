@@ -17,7 +17,7 @@ public final class JobManifest extends AbstractJob {
     }
 
     @Override
-    protected void linkResources(Map<String, Resource> sharedResources) {
+    protected void linkResources(Map<String, Resource> resourcePool) {
 
     }
 

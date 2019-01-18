@@ -29,9 +29,9 @@ public interface Job extends Resource {
 
     String getFQJI();
 
-    boolean execute(boolean parallelExecution);
+    boolean execute();
 
-    void link(Map<String, Resource> sharedResources);
+    void link(Map<String, Resource> resourcePool);
 
     void validate() throws JobValidationException;
 

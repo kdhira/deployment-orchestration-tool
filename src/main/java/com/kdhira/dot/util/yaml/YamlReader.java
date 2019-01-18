@@ -11,7 +11,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Tag;
 
-public class YamlReader<T> {
+public class YamlReader {
 
     private List<TypeDescription> typeDescriptions;
 
@@ -23,9 +23,13 @@ public class YamlReader<T> {
         typeDescriptions.add(new TypeDescription(subclass, new Tag("!" + subclass.getSimpleName())));
     }
 
+    public <T> List<T> readDocument(String yamlLocation, Class<T> documentRoot) throws FileNotFoundException {
+        return readDocument(yamlLocation, documentRoot, documentRoot);
+    }
+
     @SuppressWarnings("unchecked")
-    public List<T> readDocument(String yamlLocation, Class<? extends T> documentRoot) throws FileNotFoundException {
-        Constructor yamlConstructor = new Constructor(documentRoot);
+    public <T, U extends T> List<T> readDocument(String yamlLocation, Class<T> returnType, Class<U> rootType) throws FileNotFoundException {
+        Constructor yamlConstructor = new Constructor(rootType);
 
         for (TypeDescription td : typeDescriptions) {
             yamlConstructor.addTypeDescription(td);

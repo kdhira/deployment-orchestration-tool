@@ -69,7 +69,7 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
-    public final boolean execute(boolean parallelExecution) {
+    public final boolean execute() {
         try {
             validate();
         } catch (JobValidationException e) {
@@ -82,12 +82,12 @@ public abstract class AbstractJob implements Job {
             return false;
         }
 
-        if (parallelExecution) {
+        if (getParallelExecution()) {
             return executeInParallel();
         }
 
         for (Job job : getSubJobs()) {
-            if (!job.execute(job.getParallelExecution())) {
+            if (!job.execute()) {
                 return false;
             }
         }
@@ -111,16 +111,16 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
-    public final void link(Map<String, Resource> sharedResources) {
-        this.linkResources(sharedResources);
+    public final void link(Map<String, Resource> resourcePool) {
+        this.linkResources(resourcePool);
 
         subJobs = subJobs.stream()
-                .map((job) -> Resources.lookup(sharedResources, job))
+                .map((job) -> Resources.lookup(resourcePool, job))
                 .collect(Collectors.toList());
 
         for (Job job : subJobs) {
             job.setParent(this);
-            job.link(sharedResources);
+            job.link(resourcePool);
         }
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractJob implements Job {
         for (Job job : getSubJobs()) {
             statuses.put(job, false);
             Thread jobThread = new Thread(() -> {
-                boolean status = job.execute(job.getParallelExecution());
+                boolean status = job.execute();
                 statuses.put(job, status);
             });
             threads.put(job, jobThread);
@@ -166,8 +166,8 @@ public abstract class AbstractJob implements Job {
 
     /**
      * Link job's resources to shared resource pool.
-     * @param sharedResources resource pool to use
+     * @param resourcePool resource pool to use
      */
-    protected abstract void linkResources(Map<String, Resource> sharedResources);
+    protected abstract void linkResources(Map<String, Resource> resourcePool);
 
 }

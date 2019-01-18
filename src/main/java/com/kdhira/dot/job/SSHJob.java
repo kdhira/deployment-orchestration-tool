@@ -83,8 +83,8 @@ public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponentSc
     }
 
     @Override
-    protected void linkResources(Map<String, Resource> sharedResources) {
-        setConnection(Resources.lookup(sharedResources, getConnection()));
+    protected void linkResources(Map<String, Resource> resourcePool) {
+        setConnection(Resources.lookup(resourcePool, getConnection()));
     }
 
 }
