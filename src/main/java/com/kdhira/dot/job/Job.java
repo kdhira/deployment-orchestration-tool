@@ -5,6 +5,10 @@ import java.util.Map;
 
 import com.kdhira.dot.resource.Resource;
 
+/**
+ * Structural and functional definition for jobs.
+ * @author Kevin Hira
+ */
 public interface Job extends Resource {
 
     String getJobDescription();
@@ -30,7 +34,5 @@ public interface Job extends Resource {
     void link(Map<String, Resource> sharedResources);
 
     void validate() throws JobValidationException;
-
-
 
 }

@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.kdhira.dot.schema.RootResourceSchema;
 
+/**
+ * Root Resource implementation.
+ * @author Kevin Hira
+ */
 public class RootResource implements RootResourceSchema {
 
     private List<Resource> resources;

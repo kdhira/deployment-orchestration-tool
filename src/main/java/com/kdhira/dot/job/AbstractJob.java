@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.util.Resources;
 
+/**
+ * Partial implementation of {@link Job}. Subclasses left to define template methods.
+ * @author Kevin Hira
+ */
 public abstract class AbstractJob implements Job {
 
     protected String id;
@@ -103,7 +107,7 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public String getFQJI() {
-        return (getParent() != null ? parent.getFQJI() + "|" : "") + getId(); 
+        return (getParent() != null ? parent.getFQJI() + "|" : "") + getId();
     }
 
     @Override
@@ -154,8 +158,16 @@ public abstract class AbstractJob implements Job {
         System.out.println("[" + getFQJI() + "]\t" + s);
     }
 
+    /**
+     * Execute the job.
+     * @return whether the job ran successfully
+     */
     protected abstract boolean runJob();
 
+    /**
+     * Link job's resources to shared resource pool.
+     * @param sharedResources resource pool to use
+     */
     protected abstract void linkResources(Map<String, Resource> sharedResources);
 
 }

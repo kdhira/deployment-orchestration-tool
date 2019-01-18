@@ -9,6 +9,10 @@ import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.schema.BashJobSchema;
 import com.kdhira.dot.util.ProcessSpawner;
 
+/**
+ * Bash job implementation. Spawns subprocesses to execute commands.
+ * @author Kevin Hira
+ */
 public class BashJob extends AbstractJob implements BashJobSchema {
 
     private final static Integer[] ALLOWED_EXIT_CODES = {0};

@@ -2,12 +2,17 @@ package com.kdhira.dot.resource;
 
 import java.io.IOException;
 
+import com.kdhira.dot.util.ProcessSpawner;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 import com.kdhira.dot.util.ssh.exec.ExecSSHClient;
 import com.kdhira.dot.util.ssh.exec.ExecSSHPasswordAuthentication;
 import com.kdhira.dot.util.ssh.exec.ExecSSHPrivateKeyAuthentication;
 
+/**
+ * Host implementation utilising {@link ExecSSHClient} and {@link ProcessSpawner}.
+ * @author Kevin Hira
+ */
 public class SSHHost extends AbstractHost {
 
     @Override

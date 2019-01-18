@@ -6,15 +6,19 @@ import java.util.List;
 import java.util.Map;
 
 import com.kdhira.dot.resource.Host;
-import com.kdhira.dot.resource.HostComponent;
 import com.kdhira.dot.resource.Resource;
+import com.kdhira.dot.schema.HostComponentSchema;
 import com.kdhira.dot.schema.SSHJobSchema;
 import com.kdhira.dot.util.Resources;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 import com.kdhira.dot.util.ssh.SSHRunnable;
 
-public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponent {
+/**
+ * SSH job implementation. Uses SSH clients to execute commands and transfers to/from remote hosts.
+ * @author Kevin Hira
+ */
+public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponentSchema {
 
     private List<SSHRunnable> commands;
     private Host connection;

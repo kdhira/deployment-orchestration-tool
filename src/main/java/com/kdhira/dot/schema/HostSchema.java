@@ -1,5 +1,10 @@
 package com.kdhira.dot.schema;
 
+/**
+ * Schema for host descriptions.
+ * Holds information such as host address, port and login credentials (password or private key).
+ * @author Kevin Hira
+ */
 public interface HostSchema {
 
     String getHost();
