@@ -3,9 +3,8 @@ package com.kdhira.dot.job;
 import java.util.Map;
 
 import com.kdhira.dot.resource.Resource;
-import com.kdhira.dot.schema.NoOperationJobSchema;
 
-public final class JobManifest extends AbstractJob implements NoOperationJobSchema {
+public final class JobManifest extends AbstractJob {
 
     @Override
     public boolean runJob() {
