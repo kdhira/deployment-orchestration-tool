@@ -74,6 +74,13 @@ public class AlternatingWriter {
                 }
             }
         }
+
+        for (InputStream stream : streams.keySet()) {
+            StringBuilder builder = builders.get(stream);
+            if (builder.length() > 0) {
+                streams.get(stream).accept(builder.toString());
+            }
+        }
     }
 
     private boolean anyAvailable() throws IOException {
