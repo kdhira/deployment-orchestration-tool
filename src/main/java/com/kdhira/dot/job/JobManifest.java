@@ -60,14 +60,14 @@ public final class JobManifest extends AbstractJob implements JobManifestSchema 
     }
 
     @Override
-    protected void linkResources(Map<String, Resource> sharedResources) {
+    protected void linkResources(Map<String, Resource> resourcePool) {
         subJobs = subJobs.stream()
-                .map((job) -> Resources.lookup(sharedResources, job))
+                .map((job) -> Resources.lookup(resourcePool, job))
                 .collect(Collectors.toList());
 
         for (Job job : subJobs) {
             job.setParent(this);
-            job.link(sharedResources);
+            job.link(resourcePool);
         }
     }
 

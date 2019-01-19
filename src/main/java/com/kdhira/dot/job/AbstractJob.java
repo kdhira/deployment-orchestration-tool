@@ -65,8 +65,8 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
-    public final void link(Map<String, Resource> sharedResources) {
-        linkResources(sharedResources);
+    public final void link(Map<String, Resource> resourcePool) {
+        linkResources(resourcePool);
     }
 
     @Override
@@ -92,8 +92,8 @@ public abstract class AbstractJob implements Job {
 
     /**
      * Link job's resources to shared resource pool.
-     * @param sharedResources resource pool to use
+     * @param resourcePool resource pool to use
      */
-    protected abstract void linkResources(Map<String, Resource> sharedResources);
+    protected abstract void linkResources(Map<String, Resource> resourcePool);
 
 }

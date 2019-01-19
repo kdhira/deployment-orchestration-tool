@@ -53,7 +53,7 @@ public class BashJob extends AbstractJob implements BashJobSchema {
     }
 
     @Override
-    protected void linkResources(Map<String, Resource> sharedResources) {
+    protected void linkResources(Map<String, Resource> resourcePool) {
 
     }
 

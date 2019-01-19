@@ -22,7 +22,7 @@ public interface Job extends Resource {
 
     boolean execute();
 
-    void link(Map<String, Resource> sharedResources);
+    void link(Map<String, Resource> resourcePool);
 
     void validate() throws JobValidationException;
 
