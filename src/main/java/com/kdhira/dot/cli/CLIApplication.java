@@ -13,6 +13,10 @@ import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.resource.RootResource;
 import com.kdhira.dot.util.yaml.YamlReader;
 
+/**
+ * CLI starter for Deployment Orchestration Tool.
+ * @author Kevin Hira
+ */
 public class CLIApplication {
 
     private Map<String, Resource> resourcePool;

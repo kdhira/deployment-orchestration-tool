@@ -7,6 +7,10 @@ import java.util.List;
 import com.kdhira.dot.cli.Settings;
 import com.kdhira.dot.util.argument.Rule;
 
+/**
+ * {@link Rule} for parsing manifest files.
+ * @author Kevin Hira
+ */
 public class ManifestRule implements Rule<Settings> {
 
     @Override

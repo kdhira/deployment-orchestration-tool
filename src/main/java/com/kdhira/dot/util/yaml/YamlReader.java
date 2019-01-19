@@ -12,6 +12,10 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Tag;
 
+/**
+ * Wrapper implementation of {@link Yaml}.
+ * @author Kevin Hira
+ */
 public class YamlReader {
 
     private List<TypeDescription> typeDescriptions;

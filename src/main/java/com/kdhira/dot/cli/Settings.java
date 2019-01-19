@@ -6,6 +6,10 @@ import java.util.List;
 
 import com.kdhira.dot.util.argument.Validatable;
 
+/**
+ * Argument settings for the CLI
+ * @author Kevin Hira
+ */
 public class Settings implements Validatable {
 
     private List<File> resourceList;

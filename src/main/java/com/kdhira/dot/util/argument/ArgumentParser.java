@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Reusable argument parser.
+ * @param <T> type of object to configure
+ * @author Kevin Hira
+ */
 public class ArgumentParser<T extends Validatable> {
 
     private List<String> arguments;
@@ -32,7 +37,7 @@ public class ArgumentParser<T extends Validatable> {
             }
         }
 
-        return obj;
+        return obj.validate() ? obj : null;
     }
 
 }
