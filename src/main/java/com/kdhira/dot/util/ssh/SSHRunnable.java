@@ -1,6 +1,9 @@
 package com.kdhira.dot.util.ssh;
 
 import java.io.IOException;
+import java.util.function.Consumer;
+
+import com.kdhira.dot.util.ColoredString;
 
 /**
  * Functional definition for SSH operations.
@@ -8,7 +11,7 @@ import java.io.IOException;
  */
 public interface SSHRunnable {
 
-    int run(SSHClient client) throws SSHException, IOException;
+    int run(SSHClient client, Consumer<ColoredString> relay) throws SSHException, IOException;
 
     String commandString();
 

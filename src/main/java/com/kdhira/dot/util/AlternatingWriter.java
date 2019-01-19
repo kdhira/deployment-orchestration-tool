@@ -40,9 +40,14 @@ public class AlternatingWriter {
         addStream(stream, relay, StringColor.NONE);
     }
 
-    public void relayWhile(Supplier<Boolean> condition) throws IOException {
+    public void relayWhile(Supplier<Boolean> actualCondition) throws IOException {
+        relayWhile(actualCondition, true);
+    }
+
+    public void relayWhile(Supplier<Boolean> actualCondition, boolean expectedCondition) throws IOException {
         Map<InputStream, StringBuilder> builders = new HashMap<InputStream, StringBuilder>();
-        while (condition.get() || anyAvailable()) {
+
+        while (actualCondition.get() == expectedCondition || anyAvailable()) {
             for (Entry<InputStream, Consumer<String>> streamRelayPair : streams.entrySet()) {
                 InputStream stream = streamRelayPair.getKey();
                 Consumer<String> relay = streamRelayPair.getValue();
@@ -61,12 +66,12 @@ public class AlternatingWriter {
                     if (i == '\n') {
                         relay.accept(builder.toString());
                         builder.setLength(0);
+                        break;
                     }
                     else {
                         builder.append((char) i);
                     }
                 }
-
             }
         }
     }

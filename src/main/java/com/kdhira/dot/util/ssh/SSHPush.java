@@ -1,6 +1,9 @@
 package com.kdhira.dot.util.ssh;
 
 import java.io.IOException;
+import java.util.function.Consumer;
+
+import com.kdhira.dot.util.ColoredString;
 
 /**
  * Implementation for sending files to remote hosts.
@@ -9,7 +12,7 @@ import java.io.IOException;
 public class SSHPush extends AbstractSSHPushPull {
 
     @Override
-    public int run(SSHClient client) throws SSHException, IOException {
+    public int run(SSHClient client, Consumer<ColoredString> relay) throws SSHException, IOException {
         return client.push(getLocal(), getRemote());
     }
 
