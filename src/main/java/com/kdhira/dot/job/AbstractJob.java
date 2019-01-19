@@ -11,7 +11,7 @@ import com.kdhira.dot.resource.Resource;
 public abstract class AbstractJob implements Job {
 
     protected String id;
-    private String jobDescription;
+    private String description;
     private Job parent;
 
     @Override
@@ -26,14 +26,14 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
-    public final String getJobDescription() {
-        return jobDescription;
+    public final String getDescription() {
+        return description;
     }
 
     @Override
-    public final void setJobDescription(String jobDescription) {
-        throwIfNotNull(this.jobDescription);
-        this.jobDescription = jobDescription;
+    public final void setDescription(String description) {
+        throwIfNotNull(this.description);
+        this.description = description;
     }
 
     @Override

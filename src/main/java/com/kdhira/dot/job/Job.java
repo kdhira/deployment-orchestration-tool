@@ -10,9 +10,9 @@ import com.kdhira.dot.resource.Resource;
  */
 public interface Job extends Resource {
 
-    String getJobDescription();
+    String getDescription();
 
-    void setJobDescription(String jobDescription);
+    void setDescription(String jobDescription);
 
     Job getParent();
 
