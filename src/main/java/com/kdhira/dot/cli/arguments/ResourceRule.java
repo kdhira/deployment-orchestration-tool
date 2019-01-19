@@ -16,7 +16,7 @@ public class ResourceRule implements Rule<Settings> {
         }
         if (arguments.get(0).equals("--resource") || arguments.get(0).equals("-r")) {
             if (arguments.size() < 2) {
-                throw new RuntimeException(new IllegalArgumentException("--resource | -r must be followed by path to file."));
+                throw new RuntimeException(new IllegalArgumentException("--resource | -r must be followed by file path."));
             }
             File resourceFile = new File(arguments.get(1));
             if (!resourceFile.exists()) {

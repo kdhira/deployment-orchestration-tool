@@ -16,7 +16,7 @@ public class ManifestRule implements Rule<Settings> {
         }
         if (arguments.get(0).equals("--manifest") || arguments.get(0).equals("-m")) {
             if (arguments.size() < 2) {
-                throw new RuntimeException(new IllegalArgumentException("--manifest | -m must be followed by path to file."));
+                throw new RuntimeException(new IllegalArgumentException("--manifest | -m must be followed by file path."));
             }
             File manifestFile = new File(arguments.get(1));
             if (!manifestFile.exists()) {
