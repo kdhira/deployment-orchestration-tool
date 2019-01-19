@@ -1,75 +1,98 @@
 package com.kdhira.dot.cli;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.kdhira.dot.job.BashJob;
 import com.kdhira.dot.job.Job;
 import com.kdhira.dot.job.JobManifest;
-import com.kdhira.dot.job.SSHJob;
-import com.kdhira.dot.resource.JSchHost;
 import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.resource.RootResource;
-import com.kdhira.dot.resource.SSHHost;
-import com.kdhira.dot.util.ssh.SSHCommand;
-import com.kdhira.dot.util.ssh.SSHPull;
-import com.kdhira.dot.util.ssh.SSHPush;
 import com.kdhira.dot.util.yaml.YamlReader;
 
 public class CLIApplication {
 
-    String manifestPath;
-    String resourcePath;
+    private Map<String, Resource> resourcePool;
+    private List<Job> manifests;
+    private YamlReader yamlReader;
+    private Settings settings;
 
-    public boolean execute(String[] args) {
-        manifestPath = "/Users/kevin/git/kdhira/dot/noop-project/jobConfig.yml";
-        resourcePath = "/Users/kevin/git/kdhira/dot/noop-project/resourceConfig.yml";
+    public CLIApplication(Settings settings) {
+        this.settings = settings;
+        this.resourcePool = new HashMap<String, Resource>();
+        this.manifests = new ArrayList<Job>();
 
-        YamlReader yamlReader = new YamlReader();
-        yamlReader.registerType(BashJob.class);
-        yamlReader.registerType(SSHJob.class);
-        yamlReader.registerType(JobManifest.class);
-        yamlReader.registerType(SSHHost.class);
-        yamlReader.registerType(JSchHost.class);
-        yamlReader.registerType(SSHCommand.class);
-        yamlReader.registerType(SSHPush.class);
-        yamlReader.registerType(SSHPull.class);
+        yamlReader = new YamlReader();
 
-        Map<String, Resource> resourcePool = new HashMap<String, Resource>();
+        List<String> supportedTypes;
+
         try {
-            for (RootResource rr : yamlReader.readDocument(resourcePath, RootResource.class)) {
-                for (Resource r : rr.getResources()) {
-                    if (resourcePool.containsKey(r.getId())) {
-                        throw new RuntimeException("Can not have 2 resources with same id.");
-                    }
-                    resourcePool.put(r.getId(), r);
-                }
+            supportedTypes = yamlReader.readResource(
+                    CLIApplication.class.getClassLoader().getResourceAsStream("supportedTypeDescriptions.yml"));
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        for (String type : supportedTypes) {
+            try {
+                yamlReader.registerType(Class.forName(type));
+            }
+            catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
-        catch (FileNotFoundException e) {
-            // TODO do better
-            e.printStackTrace();
-            return false;
-        }
 
-        List<Job> manifests;
-        try {
-            manifests = yamlReader.readDocument(manifestPath, Job.class, JobManifest.class);
-        }
-        catch (FileNotFoundException e) {
-            // TODO do better
-            e.printStackTrace();
-            return false;
-        }
+        readResources();
+        readManifests();
+    }
 
+    public boolean execute() {
         for (Job job : manifests) {
             job.link(resourcePool);
-            job.execute();
+            if (!job.execute()) {
+                return false;
+            }
         }
 
-        return false;
+        return true;
+    }
+
+    private void readResources() {
+        List<RootResource> rootResources = new ArrayList<RootResource>();
+
+        for (File resourceFile : settings.getResourceList()) {
+            try {
+                rootResources.addAll(yamlReader.readDocument(resourceFile, RootResource.class));
+            }
+            catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (RootResource rr : rootResources) {
+            for (Resource r : rr.getResources()) {
+                if (resourcePool.containsKey(r.getId())) {
+                    throw new RuntimeException("Duplicate ids across resources not allowed.");
+                }
+                resourcePool.put(r.getId(), r);
+            }
+        }
+    }
+
+    private void readManifests() {
+        for (File manifestFile : settings.getManifestList()) {
+            try {
+                manifests.addAll(yamlReader.readDocument(manifestFile, Job.class, JobManifest.class));
+            }
+            catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

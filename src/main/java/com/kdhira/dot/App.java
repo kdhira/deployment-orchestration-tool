@@ -4,17 +4,34 @@
 package com.kdhira.dot;
 
 import com.kdhira.dot.cli.CLIApplication;
+import com.kdhira.dot.cli.Settings;
+import com.kdhira.dot.cli.arguments.ManifestRule;
+import com.kdhira.dot.cli.arguments.ResourceRule;
+import com.kdhira.dot.util.argument.ArgumentParser;
 
 public class App {
-    public String getGreeting() {
-        return "Hello world.";
-    }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        System.out.println("\u001B[36mDeployment Orchestration Tool - Kevin Hira\u001B[0m");
 
-        if (args.length > 0) {
-            new CLIApplication().execute(args);
+        if (args.length <= 0) {
+            System.err.println("No arguments supplied. Exiting");
+            System.exit(2);
+        }
+
+        ArgumentParser<Settings> argumentParser = new ArgumentParser<Settings>(args);
+        argumentParser.addRule(new ManifestRule());
+        argumentParser.addRule(new ResourceRule());
+        Settings cliSettings = argumentParser.apply(new Settings());
+
+        if (cliSettings.validate()) {
+            CLIApplication cli = new CLIApplication(cliSettings);
+            System.exit(cli.execute() ? 0 : 1);
+        }
+        else {
+            System.out.println("Usage here");
+            System.exit(3);
         }
     }
+
 }

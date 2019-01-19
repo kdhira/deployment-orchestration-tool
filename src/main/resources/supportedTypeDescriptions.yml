@@ -1,0 +1,8 @@
+- com.kdhira.dot.job.JobManifest
+- com.kdhira.dot.job.BashJob
+- com.kdhira.dot.job.SSHJob
+- com.kdhira.dot.resource.SSHHost
+- com.kdhira.dot.resource.JSchHost
+- com.kdhira.dot.util.ssh.SSHCommand
+- com.kdhira.dot.util.ssh.SSHPush
+- com.kdhira.dot.util.ssh.SSHPull
