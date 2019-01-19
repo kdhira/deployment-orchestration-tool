@@ -37,7 +37,7 @@ public class App {
             System.exit(cli.execute() ? 0 : 1);
         }
         else {
-            System.out.println(usage());
+            System.err.println(usage());
             System.exit(3);
         }
     }
