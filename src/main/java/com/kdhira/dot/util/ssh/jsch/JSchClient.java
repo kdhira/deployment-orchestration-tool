@@ -27,12 +27,18 @@ public class JSchClient implements SSHClient {
     private JSch jsch;
     private Session session;
 
+    private static Properties defaultProperties() {
+        Properties properties = new Properties();
+        properties.put("StrictHostKeyChecking", "no");
+        return properties;
+    }
+
     public JSchClient(String host, String user, JSchAuthentication auth) throws SSHException {
-        this(host, 22, user, auth, new Properties());
+        this(host, 22, user, auth, defaultProperties());
     }
 
     public JSchClient(String host, int port, String user, JSchAuthentication auth) throws SSHException {
-        this(host, port, user, auth, new Properties());
+        this(host, port, user, auth, defaultProperties());
     }
 
     public JSchClient(String host, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
