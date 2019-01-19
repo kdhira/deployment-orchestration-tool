@@ -3,6 +3,7 @@ package com.kdhira.dot.job;
 import java.util.Map;
 
 import com.kdhira.dot.resource.Resource;
+import com.kdhira.dot.util.ColoredString;
 
 /**
  * Partial implementation of {@link Job}. Subclasses left to define template methods.
@@ -83,6 +84,11 @@ public abstract class AbstractJob implements Job {
     protected void println(String s) {
         System.out.println("[" + getFQJI() + "]\t" + s);
     }
+
+    protected void println(ColoredString s) {
+        println(s.toString());
+    }
+
 
     /**
      * Execute the job.

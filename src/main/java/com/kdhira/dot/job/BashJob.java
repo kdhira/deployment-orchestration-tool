@@ -41,7 +41,7 @@ public class BashJob extends AbstractJob implements BashJobSchema {
         ProcessSpawner processSpawner = new ProcessSpawner();
         for (String command : commands) {
             println("Executing `" + command + "`");
-            int exitCode = processSpawner.spawnProcess(command);
+            int exitCode = processSpawner.spawnProcess(command, this::println);
             println("Command `" + command + "` => Exit code: " + exitCode);
 
             if (!allowedExitCodes.contains(exitCode)) {
