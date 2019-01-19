@@ -22,16 +22,34 @@ public class App {
         ArgumentParser<Settings> argumentParser = new ArgumentParser<Settings>(args);
         argumentParser.addRule(new ManifestRule());
         argumentParser.addRule(new ResourceRule());
-        Settings cliSettings = argumentParser.apply(new Settings());
+        Settings cliSettings = new Settings();
+        try {
+            cliSettings = argumentParser.apply(new Settings());
+        }
+        catch (RuntimeException e) {
+            e.printStackTrace();
+            System.err.println(usage());
+            System.exit(3);
+        }
 
         if (cliSettings.validate()) {
             CLIApplication cli = new CLIApplication(cliSettings);
             System.exit(cli.execute() ? 0 : 1);
         }
         else {
-            System.out.println("Usage here");
+            System.out.println(usage());
             System.exit(3);
         }
+    }
+
+    private static String usage() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("\nUsage: dot --manifest|-m <file> [--manifest|-m <file> ...] [--resource|-r <file> ...]");
+        builder.append("\n\t--manifest|-m <file>\t\tFile to load job manifests from.");
+        builder.append("\n\t--resource|-r <file>\t\tFile to load shared resources from.");
+
+        return builder.toString();
     }
 
 }
