@@ -1,5 +1,6 @@
 package com.kdhira.dot.job;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,10 @@ public final class JobManifest extends AbstractJob implements JobManifestSchema 
 
     private List<Job> subJobs;
     private boolean concurrent;
+
+    public JobManifest() {
+        subJobs = new ArrayList<Job>();
+    }
 
     @Override
     public final List<Job> getSubJobs() {
