@@ -28,7 +28,7 @@ public class ProcessSpawner {
             InputStream err = p.getErrorStream();
 
             AlternatingWriter alternatingWriter = new AlternatingWriter();
-            alternatingWriter.addStream(in, outputRelay, StringColor.GREEN);
+            alternatingWriter.addStream(in, outputRelay, StringColor.CYAN);
             alternatingWriter.addStream(err, outputRelay, StringColor.RED);
 
             alternatingWriter.relayWhile(p::isAlive);

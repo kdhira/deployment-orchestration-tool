@@ -7,10 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kdhira.dot.Constants;
 import com.kdhira.dot.job.Job;
 import com.kdhira.dot.job.JobManifest;
 import com.kdhira.dot.resource.Resource;
 import com.kdhira.dot.resource.RootResource;
+import com.kdhira.dot.util.ColoredString;
+import com.kdhira.dot.util.ColoredString.StringColor;
 import com.kdhira.dot.util.yaml.YamlReader;
 
 /**
@@ -58,11 +61,18 @@ public class CLIApplication {
     public boolean execute() {
         for (Job job : manifests) {
             job.link(resourcePool);
+
+            System.out.println(String.format(Constants.JOB_RUNNING, job.getId()));
+
             if (!job.execute()) {
+                System.out.println(new ColoredString(String.format(Constants.JOB_UNSUCCESSFUL, job.getId()), StringColor.RED));
                 return false;
             }
+
+            System.out.println(new ColoredString(String.format(Constants.JOB_SUCCESSFUL, job.getId()), StringColor.GREEN));
         }
 
+        System.out.println(new ColoredString(Constants.ALL_DONE, StringColor.GREEN));
         return true;
     }
 

@@ -190,7 +190,7 @@ public class JSchClient implements SSHClient {
         InputStream err = channel.getExtInputStream();
 
         AlternatingWriter alternatingWriter = new AlternatingWriter();
-        alternatingWriter.addStream(in, relay, StringColor.GREEN);
+        alternatingWriter.addStream(in, relay, StringColor.CYAN);
         alternatingWriter.addStream(err, relay, StringColor.RED);
 
         alternatingWriter.relayWhile(channel::isClosed, false);
