@@ -83,7 +83,7 @@ public class JSchClient implements SSHClient {
         OutputStream out = channel.getOutputStream();
         InputStream in = channel.getInputStream();
 
-        checkAcknowledgement(in);
+        waitForAcknowledgement(in);
 
         File localFile = new File(localPath);
 
@@ -94,7 +94,7 @@ public class JSchClient implements SSHClient {
         out.write(command.getBytes());
         out.flush();
 
-        checkAcknowledgement(in);
+        waitForAcknowledgement(in);
 
         // send a content of lfile
         FileInputStream fis = new FileInputStream(localFile);
@@ -105,12 +105,10 @@ public class JSchClient implements SSHClient {
             bytesTransferred = transferBytes(fis, out, buffer, buffer.length);
         } while (bytesTransferred > 0);
 
-        // send '\0'
-        out.write(0);
-        out.flush();
+        sendAcknowledgement(out);
 
         out.close();
-        checkAcknowledgement(in);
+        waitForAcknowledgement(in);
         in.close();
         fis.close();
 
@@ -135,9 +133,7 @@ public class JSchClient implements SSHClient {
 
         byte[] buffer = new byte[BUFFER_SIZE];
 
-        // send '\0'
-        out.write(0);
-        out.flush();
+        sendAcknowledgement(out);
 
         if (in.read() != 'C') {
             throw new SSHException("Expected start of file metadata, did not receive.");
@@ -149,27 +145,23 @@ public class JSchClient implements SSHClient {
         long fileSize = Long.valueOf(readUntil(in, ' '));
         String fileName = readUntil(in, '\n');
 
-        // send '\0'
-        out.write(0);
-        out.flush();
+        sendAcknowledgement(out);
 
         // read a content of lfile
         File localFile = new File(prefix == null ? localPath : prefix + fileName);
         FileOutputStream fos = new FileOutputStream(localFile);
         int bytesTransferred;
         do {
-            int nextRead = (buffer.length < fileSize ? buffer.length : (int)fileSize);
+            int nextRead = (buffer.length < fileSize ? buffer.length : (int) fileSize);
             bytesTransferred = transferBytes(in, fos, buffer, nextRead);
 
             fileSize -= bytesTransferred;
         } while (bytesTransferred > 0 && fileSize > 0L);
 
-        // send '\0'
-        out.write(0);
-        out.flush();
+        waitForAcknowledgement(in);
+        sendAcknowledgement(out);
 
         out.close();
-        checkAcknowledgement(in);
         in.close();
         fos.close();
 
@@ -191,9 +183,8 @@ public class JSchClient implements SSHClient {
                 if (i == '\n') {
                     System.out.println(outputBuffer.toString());
                     outputBuffer = new StringBuilder();
-                }
-                else {
-                    outputBuffer.append((char)i);
+                } else {
+                    outputBuffer.append((char) i);
                 }
             }
         }
@@ -223,6 +214,7 @@ public class JSchClient implements SSHClient {
 
     private int getExitCodeAndDisconnect(Channel channel) {
         int exitStatus = ((ChannelExec)channel).getExitStatus();
+        exitStatus = channel.getExitStatus();
         channel.disconnect();
         return exitStatus;
     }
@@ -238,27 +230,30 @@ public class JSchClient implements SSHClient {
     /**
      * Check aknowledgement from server by reading stream.
      * @param in stream to read
-     * @return acknowledgement value
-     * may be 0 for success,
-     *        1 for error,
-     *        2 for fatal error,
-     *       -1
      * @throws IOException
      */
-    private int readAck(InputStream in) throws IOException {
+    private void waitForAcknowledgement(InputStream in) throws IOException {
         int b = in.read();
 
         if (b > 0) {
             StringBuffer sb = new StringBuffer();
-            int c;
-            do {
-                c = in.read();
+            int c = in.read();
+            while (c > 0 && c != '\n') {
                 sb.append((char) c);
+                c = in.read();
             }
-            while (c != '\n');
             throw new IOException(sb.toString());
         }
-        return b;
+    }
+
+    /**
+     * Send acknowledgement.
+     * @param out stream to send to
+     * @throws IOException
+     */
+    private void sendAcknowledgement(OutputStream out) throws IOException {
+        out.write(0);
+        out.flush();
     }
 
     private String readUntil(InputStream in, char stopper) throws IOException {
@@ -270,11 +265,4 @@ public class JSchClient implements SSHClient {
         }
         return sb.toString();
     }
-
-    private void checkAcknowledgement(InputStream in) throws SSHException, IOException {
-        if (readAck(in) != 0) {
-            throw new SSHException("Acknowledgement failed.");
-        }
-    }
-
 }
