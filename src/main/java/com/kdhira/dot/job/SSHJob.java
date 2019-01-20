@@ -35,7 +35,7 @@ public class SSHJob extends AbstractJob implements SSHJobSchema, HostComponentSc
                 currentCommand = command;
 
                 println(command.commandString());
-                int exitCode = command.run(ssh);
+                int exitCode = command.run(ssh, this::println);
                 println(command.commandString() + " => Exit code: " + exitCode);
 
                 if (exitCode > 0) {

@@ -1,7 +1,9 @@
 package com.kdhira.dot.util.ssh.exec;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
+import com.kdhira.dot.util.ColoredString;
 import com.kdhira.dot.util.ProcessSpawner;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
@@ -31,7 +33,15 @@ public class ExecSSHClient implements SSHClient {
 
         processSpawner = new ProcessSpawner();
 
-        if (execute(":") != 0) {
+        Consumer<ColoredString> noopRelay = new Consumer<ColoredString>() {
+
+            @Override
+            public void accept(ColoredString t) {
+
+            }
+        };
+
+        if (execute(":", noopRelay) != 0) {
             throw new SSHException("Could not connect to host");
         }
     }
@@ -65,7 +75,7 @@ public class ExecSSHClient implements SSHClient {
     }
 
     @Override
-    public int execute(String command) throws SSHException, IOException {
+    public int execute(String command, Consumer<ColoredString> relay) throws SSHException, IOException {
         String executeCommand = buildCommand(
             generateBaseCommand("ssh"),
             getConnectionString(),
@@ -73,11 +83,15 @@ public class ExecSSHClient implements SSHClient {
             command
         );
 
-        return forkProcces(executeCommand);
+        return forkProcces(executeCommand, relay);
     }
 
     private int forkProcces(String command) {
         return processSpawner.spawnProcess(command);
+    }
+
+    private int forkProcces(String command, Consumer<ColoredString> relay) {
+        return processSpawner.spawnProcess(command, relay);
     }
 
     @Override

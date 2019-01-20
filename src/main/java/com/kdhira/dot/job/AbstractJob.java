@@ -2,7 +2,10 @@ package com.kdhira.dot.job;
 
 import java.util.Map;
 
+import com.kdhira.dot.Constants;
 import com.kdhira.dot.resource.Resource;
+import com.kdhira.dot.util.ColoredString;
+import com.kdhira.dot.util.ColoredString.StringColor;
 
 /**
  * Partial implementation of {@link Job}. Subclasses left to define template methods.
@@ -45,7 +48,6 @@ public abstract class AbstractJob implements Job {
             return false;
         }
 
-        println("Running job '" + getId() + "'");
         return runJob();
     }
 
@@ -81,8 +83,13 @@ public abstract class AbstractJob implements Job {
     }
 
     protected void println(String s) {
-        System.out.println("[" + getFQJI() + "]\t" + s);
+        System.out.println("[" + new ColoredString(getFQJI(), StringColor.CYAN) + "] " + s);
     }
+
+    protected void println(ColoredString s) {
+        println(s.toString());
+    }
+
 
     /**
      * Execute the job.

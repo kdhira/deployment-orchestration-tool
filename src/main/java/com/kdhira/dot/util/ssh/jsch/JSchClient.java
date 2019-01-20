@@ -7,17 +7,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.kdhira.dot.util.AlternatingWriter;
+import com.kdhira.dot.util.ColoredString;
+import com.kdhira.dot.util.ColoredString.StringColor;
 import com.kdhira.dot.util.ssh.SSHClient;
 import com.kdhira.dot.util.ssh.SSHException;
 
 /**
  * SSH client implementation using JSch (Jcraft).
+ * 
  * @author Kevin Hira
  */
 public class JSchClient implements SSHClient {
@@ -45,7 +50,8 @@ public class JSchClient implements SSHClient {
         this(host, 22, user, auth, configuration);
     }
 
-    public JSchClient(String host, int port, String user, JSchAuthentication auth, Properties configuration) throws SSHException {
+    public JSchClient(String host, int port, String user, JSchAuthentication auth, Properties configuration)
+            throws SSHException {
         jsch = new JSch();
 
         auth.configureClient(jsch);
@@ -158,7 +164,7 @@ public class JSchClient implements SSHClient {
         FileOutputStream fos = new FileOutputStream(localFile);
         int bytesTransferred;
         do {
-            int nextRead = (buffer.length < fileSize ? buffer.length : (int)fileSize);
+            int nextRead = (buffer.length < fileSize ? buffer.length : (int) fileSize);
             bytesTransferred = transferBytes(in, fos, buffer, nextRead);
 
             fileSize -= bytesTransferred;
@@ -177,26 +183,17 @@ public class JSchClient implements SSHClient {
     }
 
     @Override
-    public int execute(String command) throws SSHException, IOException {
+    public int execute(String command, Consumer<ColoredString> relay) throws SSHException, IOException {
         Channel channel = openExecChannel(command);
         StringBuilder outputBuffer = new StringBuilder();
         InputStream in = channel.getInputStream();
+        InputStream err = channel.getExtInputStream();
 
-        while (!channel.isClosed()) {
-            while (in.available() > 0) {
-                int i = in.read();
-                if (i < 0) {
-                    break;
-                }
-                if (i == '\n') {
-                    System.out.println(outputBuffer.toString());
-                    outputBuffer = new StringBuilder();
-                }
-                else {
-                    outputBuffer.append((char)i);
-                }
-            }
-        }
+        AlternatingWriter alternatingWriter = new AlternatingWriter();
+        alternatingWriter.addStream(in, relay, StringColor.CYAN);
+        alternatingWriter.addStream(err, relay, StringColor.RED);
+
+        alternatingWriter.relayWhile(channel::isClosed, false);
 
         System.out.print(outputBuffer.toString());
         return getExitCodeAndDisconnect(channel);
