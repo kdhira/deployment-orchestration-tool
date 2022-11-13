@@ -1,0 +1,63 @@
+# ---
+# id: "1"
+# description: Test Job
+# subJobs: [
+#     !JobManifest {
+#         id: "1.1",
+#         subJobs: [
+#             !JobManifest {
+#                 id: "1.1.1"
+#             }
+#         ]
+#     }
+# ]
+---
+id: "2"
+concurrent: false
+subJobs:
+    - !JobManifest
+        id: "2.1"
+        subJobs:
+            - !BashJob
+                id: "bash1"
+    - !JobManifest
+        id: "2.2"
+        subJobs:
+            - !SSHJob
+                id: "2.2.1"
+                connection:
+                    !JSchHost
+                        id: "kevin@kevnet"
+                        #host: kevnet
+                        #port: 22
+                        #user: kevin
+                        #keyFile: "~/.ssh/kdhira-kp001"
+                commands:
+                    # - !SSHPush
+                    #     local: /tmp/scp-test
+                    #     remote: /tmp/scp-test69
+                    # - !SSHCommand
+                    #     command: cat /tmp/scp-test69
+                    # - !SSHCommand
+                    #     command: ls -la
+                    - !SSHPull
+                        remote: .vimrc
+                        local: /tmp/.vimrc
+    # - !JobManifest
+    #     id: "2.3"
+    #     subJobs:
+    #         - !JobManifest
+    #             id: "2.3.1"
+    # - !JobManifest
+    #     id: "2.4"
+    #     subJobs:
+    #         - !BashJob
+    #             id: "2.4.1"
+    #             commands:
+    #                 - pwd
+    #                 - ls -plaTh
+    # - !JobManifest
+    #     id: "2.5"
+    #     subJobs:
+    #         - !JobManifest
+    #             id: "2.5.1"

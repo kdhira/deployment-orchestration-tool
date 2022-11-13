@@ -1,0 +1,13 @@
+---
+resources:
+    - !JSchHost
+        id: "kevin@kevnet"
+        host: kevnet.kevinhira.com
+        port: 22
+        user: kevin
+        keyFile: "~/.ssh/kdhira-kp001"
+    - !BashJob
+        id: "bash1"
+        commands:
+            - echo "bash1 job"
+            - "SOURCE_PATH=~/git/kdhira/kevnet/jwtgen bash_deployer ~/git/kdhira/kevnet/jwtgen/jwtgen package"

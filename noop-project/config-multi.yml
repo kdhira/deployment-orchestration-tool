@@ -1,0 +1,17 @@
+---
+greeting: "Hello there1"
+faction:
+    name: "Person"
+    value: 69
+---
+greeting: "Hello there2"
+age: 23
+faction:
+    name: "Person"
+    value: 69
+---
+greeting: "Hello there3"
+age: 23
+faction:
+    name: "Person"
+    value: 69

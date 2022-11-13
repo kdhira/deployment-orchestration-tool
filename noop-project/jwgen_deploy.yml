@@ -1,0 +1,20 @@
+---
+id: jwtgen
+subJobs:
+    - !BashJob
+        id: package
+        commands:
+            - "SOURCE_PATH=~/git/kdhira/kevnet/jwtgen bash_deployer ~/git/kdhira/kevnet/jwtgen/jwtgen package"
+            - "SOURCE_PATH=~/git/kdhira/kevnet/jwtgen bash_deployer ~/git/kdhira/kevnet/jwtgen/jwtgen upload box:jwtgen"
+    - !SSHJob
+        id: install
+        connection:
+            !JSchHost
+                id: box
+                host: localhost
+                port: 2222
+                user: vagrant
+                keyFile: ~/vagrant/oh-centos/.vagrant/machines/default/virtualbox/private_key
+        commands:
+            - !SSHCommand
+                command: cd jwtgen && sudo ./bash_deployer jwtgen install

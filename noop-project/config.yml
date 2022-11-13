@@ -1,0 +1,5 @@
+greeting: "Hello there"
+age: 23
+faction:
+    name: "Person"
+    value: 69
